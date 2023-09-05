@@ -1,0 +1,9 @@
+<resources>
+    <string name="welcome_message">welcome_message</string>
+    <string name="app_name">app_name</string>
+    <string name="genre_comedy">genre_comedy</string>
+    <string name="genre_drama">genre_drama</string>
+    <string name="genre_action">genre_action</string>
+    <string name="genre_documentary">genre_documentary</string>
+    <string name="genre_musical">genre_musical</string>
+</resources>

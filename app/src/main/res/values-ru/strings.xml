@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="welcome_message">Добро пожаловать в FilmRandomizer</string>
+    <string name="app_name">FilmRandomizer</string>
+    <string name="genre_comedy">Комедия</string>
+    <string name="genre_drama">Драма</string>
+    <string name="genre_action">Боевик</string>
+    <string name="genre_documentary">Документальный фильм</string>
+    <string name="genre_musical">Мюзикл</string>
+</resources>
