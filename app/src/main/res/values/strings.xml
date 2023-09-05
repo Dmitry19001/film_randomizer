@@ -6,4 +6,8 @@
     <string name="genre_action">genre_action</string>
     <string name="genre_documentary">genre_documentary</string>
     <string name="genre_musical">genre_musical</string>
+    <string name="button_add_new">button_add_new</string>
+    <string name="film_title">film_title</string>
+    <string name="genre">genre</string>
+    <string name="button_cancel">button_cancel</string>
 </resources>

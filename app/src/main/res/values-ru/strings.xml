@@ -7,4 +7,8 @@
     <string name="genre_action">Боевик</string>
     <string name="genre_documentary">Документальный фильм</string>
     <string name="genre_musical">Мюзикл</string>
+    <string name="button_add_new">Добавить новый фильм</string>
+    <string name="film_title">Название</string>
+    <string name="genre">Жанр</string>
+    <string name="button_cancel">Отмена</string>
 </resources>
