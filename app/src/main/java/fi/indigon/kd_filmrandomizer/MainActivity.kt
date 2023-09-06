@@ -12,30 +12,39 @@ import android.widget.Spinner
 import androidx.core.view.isVisible
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-val filmTitles = arrayOf(
-    "The Shawshank Redemption",
-    "The Godfather",
-    "The Dark Knight",
-    "Pulp Fiction",
-    "Fight Club",
-    "Forrest Gump",
-    "Inception",
-    "The Matrix",
-    "Gladiator",
-    "The Silence of the Lambs",
-    "Jurassic Park",
-    "Schindler's List",
-    "The Lord of the Rings",
-    "Titanic",
-    "Star Wars",
-    "Avatar",
-    "The Avengers",
-    "The Lion King",
-    "E.T. the Extra-Terrestrial",
-    "The Terminator"
+val defaultFilmList = mutableListOf<Film>(
+    Film("The Shawshank Redemption", 1),
+    Film("The Godfather", 7),
+    Film("The Dark Knight", 8),
+    Film("Pulp Fiction", 7),
+    Film("Fight Club", 7),
+    Film("Forrest Gump", 1),
+    Film("Inception", 6),
+    Film("The Matrix", 6),
+    Film("Gladiator", 2),
+    Film("The Silence of the Lambs", 9),
+    Film("Jurassic Park", 6),
+    Film("Schindler's List", 2),
+    Film("The Lord of the Rings",8),
+    Film("Titanic", 8),
+    Film("Star Wars", 6),
+    Film("Avatar", 2),
+    Film("The Avengers", 6),
+    Film("The Lion King", 1),
+    Film("E.T. the Extra-Terrestrial", 6),
+    Film("The Terminator", 6)
 )
 
-val defaultFilmList = filmTitles.map{title -> Film(title)}.toMutableList()
+//0 genre_comedy,
+//1 genre_drama,
+//2 genre_action,
+//3 genre_documentary,
+//4 genre_musical,
+//5 genre_romance,
+//6 genre_science_fiction,
+//7 genre_crime,
+//8 genre_fantasy
+//9 genre_thriller
 
 val FilmList = mutableListOf<Film>()
 
@@ -47,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val listView = findViewById<ListView>(R.id.filmList)
-        val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
+        val filmAdapter = FilmListAdapter(this, defaultFilmList) // Replace with your data source
 
         val filmAddNewWindow = findViewById<LinearLayout>(R.id.filmAddNewWindow)
         val genreDropdown = findViewById<Spinner>(R.id.genreDropDown)

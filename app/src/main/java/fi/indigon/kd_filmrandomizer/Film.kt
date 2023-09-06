@@ -15,7 +15,12 @@ fun getGenres(context: Context): Array<String> {
         context.getString(R.string.genre_drama),
         context.getString(R.string.genre_action),
         context.getString(R.string.genre_documentary),
-        context.getString(R.string.genre_musical)
+        context.getString(R.string.genre_musical),
+        context.getString(R.string.genre_romance),
+        context.getString(R.string.genre_science_fiction),
+        context.getString(R.string.genre_crime),
+        context.getString(R.string.genre_fantasy),
+        context.getString(R.string.genre_thriller)
     )
 }
 

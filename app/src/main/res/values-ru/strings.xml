@@ -11,4 +11,10 @@
     <string name="film_title">Название</string>
     <string name="genre">Жанр</string>
     <string name="button_cancel">Отмена</string>
+    <string name="genre_science_fiction">Научная фантастика</string>
+    <string name="genre_crime">Криминал</string>
+    <string name="genre_romance">Романтика</string>
+    <string name="genre_fantasy">Фентези</string>
+    <string name="genre_thriller">Триллер</string>
+    <string name="button_delete">Удалить</string>
 </resources>

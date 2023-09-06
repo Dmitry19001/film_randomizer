@@ -10,4 +10,10 @@
     <string name="film_title">film_title</string>
     <string name="genre">genre</string>
     <string name="button_cancel">button_cancel</string>
+    <string name="genre_science_fiction">genre_science_fiction</string>
+    <string name="genre_crime">genre_crime</string>
+    <string name="genre_romance">genre_romance</string>
+    <string name="genre_fantasy">genre_fantasy</string>
+    <string name="genre_thriller">genre_thriller</string>
+    <string name="button_delete">button_delete</string>
 </resources>
