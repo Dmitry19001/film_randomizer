@@ -5,7 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 
 class FilmListAdapter(private val context: Context, private val filmList: MutableList<Film>) : BaseAdapter() {
     override fun getCount(): Int {
@@ -33,15 +36,39 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
         val watchedTextView = listItemView.findViewById<TextView>(R.id.watchedTextView)
 
         titleTextView.text = film.title
-        genreTextView.text = "Genre: ${ if (film.genre < getGenres(context).size && film.genre >= 0) getGenres(context)[film.genre] else "@strings/unknown"}"
-        watchedTextView.text = "Watched: ${ if (film.isWatched != 0) "Yes" else "No"}"
+        "Genre: ${ if (film.genre < getGenres(context).size && film.genre >= 0) getGenres(context)[film.genre] else "@strings/unknown"}".also { genreTextView.text = it }
+        "Watched: ${ if (film.isWatched != 0) "Yes" else "No"}".also { watchedTextView.text = it }
 
-        listItemView.setOnLongClickListener {
+        val filmDeletePanel = listItemView.findViewById<LinearLayout>(R.id.filmDeletePanel)
+        val buttonDeleteFilm = listItemView.findViewById<Button>(R.id.buttonDeleteFilm)
+        val buttonCancelDelete = listItemView.findViewById<Button>(R.id.buttonCancelFilmDelete)
+
+        // Handling Cancel Button
+        buttonCancelDelete.setOnClickListener {
+            switchDeletePanel(filmDeletePanel) // Hiding deletion panel
+        }
+
+        // Handling Delete Button
+        buttonDeleteFilm.setOnClickListener {
             filmList.removeAt(position) // Remove the item from the list
             notifyDataSetChanged() // Notify the adapter that the data has changed
+        }
+
+        listItemView.setOnLongClickListener {
+            switchDeletePanel(filmDeletePanel)
             true // Return true to indicate the long press is handled
         }
 
         return listItemView
     }
+
+    private fun switchDeletePanel(filmDeletePanel: LinearLayout) {
+        if (filmDeletePanel.isVisible) {
+            filmDeletePanel.visibility = View.GONE
+        } else {
+            filmDeletePanel.visibility = View.VISIBLE
+        }
+    }
+
+
 }
