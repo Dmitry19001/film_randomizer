@@ -1,6 +1,5 @@
 package fi.indigon.kd_filmrandomizer
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -9,8 +8,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 val defaultFilmList = mutableListOf<Film>(
     Film("The Shawshank Redemption", 1),
@@ -69,7 +68,7 @@ class MainActivity : AppCompatActivity() {
 
         filmAddNewWindow.visibility = View.GONE
 
-        val buttonAddNewFilm = findViewById<FloatingActionButton>(R.id.buttonAddNew)
+        val buttonAddNewFilm = findViewById<Button>(R.id.buttonAddNew)
         buttonAddNewFilm.setOnClickListener {
             switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
         }
@@ -103,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun switchAddWindowVisibility(
         filmAddNewWindow: LinearLayout,
-        buttonAddNewFilm: FloatingActionButton
+        buttonAddNewFilm: Button
     ) {
         filmAddNewWindow.visibility = if (filmAddNewWindow.isVisible) View.GONE else View.VISIBLE
         buttonAddNewFilm.visibility = if (buttonAddNewFilm.isVisible) View.INVISIBLE else View.VISIBLE

@@ -17,4 +17,6 @@
     <string name="genre_fantasy">Фентези</string>
     <string name="genre_thriller">Триллер</string>
     <string name="button_delete">Удалить</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="sync_header">Sync</string>
 </resources>
