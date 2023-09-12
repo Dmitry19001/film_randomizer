@@ -7,7 +7,7 @@
     <string name="genre_action">Action</string>
     <string name="genre_documentary">Documentary</string>
     <string name="genre_musical">Musical</string>
-    <string name="button_add_new">Add new film</string>
+    <string name="button_add_new">Add</string>
     <string name="film_title">Title</string>
     <string name="genre">Genre</string>
     <string name="button_cancel">Cancel</string>
@@ -19,4 +19,11 @@
     <string name="button_delete">Delete</string>
     <string name="title_activity_settings">Settings</string>
     <string name="sync_header">Sync</string>
+    <string name="main_settings_header">Main settings</string>
+    <string name="language_setting_title">Preffered language</string>
+    <string name="is_watched_header">Watched</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="add_new_header">Add new film</string>
+    <string name="empty_title_error">Title can\'t be empty!</string>
 </resources>

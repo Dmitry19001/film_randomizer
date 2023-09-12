@@ -36,8 +36,8 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
         val watchedTextView = listItemView.findViewById<TextView>(R.id.watchedTextView)
 
         titleTextView.text = film.title
-        "Genre: ${ if (film.genre < getGenres(context).size && film.genre >= 0) getGenres(context)[film.genre] else "@strings/unknown"}".also { genreTextView.text = it }
-        "Watched: ${ if (film.isWatched != 0) "Yes" else "No"}".also { watchedTextView.text = it }
+        "${context.getString(R.string.genre)}: ${ if (film.genre < getGenres(context).size && film.genre >= 0) getGenres(context)[film.genre] else "@strings/unknown"}".also { genreTextView.text = it }
+        "${context.getString(R.string.is_watched_header)}: ${ if (film.isWatched != 0) context.getString(R.string.yes) else context.getString(R.string.no)}".also { watchedTextView.text = it }
 
         val filmDeletePanel = listItemView.findViewById<LinearLayout>(R.id.filmDeletePanel)
         val buttonDeleteFilm = listItemView.findViewById<Button>(R.id.buttonDeleteFilm)

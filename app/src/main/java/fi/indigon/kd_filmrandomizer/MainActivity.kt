@@ -1,5 +1,7 @@
 package fi.indigon.kd_filmrandomizer
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -10,6 +12,9 @@ import android.widget.ListView
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.preference.PreferenceManager
+import com.google.android.material.snackbar.Snackbar
+import java.util.Locale
 
 val defaultFilmList = mutableListOf<Film>(
     Film("The Shawshank Redemption", 1),
@@ -52,10 +57,17 @@ val FilmList = mutableListOf<Film>()
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Get the selected language from SharedPreferences
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val selectedLanguage = sharedPreferences.getString("app_language", "ru") ?: "ru"
+        val locale = Locale(selectedLanguage)
+        Locale.setDefault(locale)
+
         setContentView(R.layout.activity_main)
 
         val listView = findViewById<ListView>(R.id.filmList)
-        val filmAdapter = FilmListAdapter(this, defaultFilmList) // Replace with your data source
+        val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
 
         val filmAddNewWindow = findViewById<LinearLayout>(R.id.filmAddNewWindow)
         val genreDropdown = findViewById<Spinner>(R.id.genreDropDown)
@@ -68,36 +80,71 @@ class MainActivity : AppCompatActivity() {
 
         filmAddNewWindow.visibility = View.GONE
 
+        initButtons(filmAddNewWindow, genreDropdown, filmAdapter, this)
+
+        genreDropdown.adapter = genreAdapter
+        listView.adapter = filmAdapter
+
+
+
+        // Show a Snackbar with the selected language
+        val snackbarMessage = "Selected Language: $selectedLanguage \nDefault: ${Locale.getDefault()}"
+
+        Snackbar.make(findViewById(R.id.MainLayout), snackbarMessage, Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun initButtons(
+        filmAddNewWindow: LinearLayout,
+        genreDropdown: Spinner,
+        filmAdapter: FilmListAdapter,
+        mainActivity: MainActivity
+    ) {
+        // ADD NEW FILM BUTTON
         val buttonAddNewFilm = findViewById<Button>(R.id.buttonAddNew)
         buttonAddNewFilm.setOnClickListener {
             switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
         }
 
-
+        // SUBMIT NEW FILM BUTTON
+        val titleInput = findViewById<EditText>(R.id.newFilmTitle)
         val buttonSubmitNewFilm = findViewById<Button>(R.id.button_submit_new)
-        val buttonCancelNewFilm = findViewById<Button>(R.id.button_cancel_new)
-
         buttonSubmitNewFilm.setOnClickListener {
             // TODO CHECK IF FILM ALREADY EXISTS
-            val title = findViewById<EditText>(R.id.newFilmTitle).text.toString()
+
+            val title = titleInput.text.toString()
             val genre = genreDropdown.selectedItemId.toInt()
 
-            if (title.isNotEmpty()){
-                FilmList.add( Film(title, genre) )
+            if (title.isNotEmpty()) {
+                FilmList.add(Film(title, genre))
 
                 filmAdapter.notifyDataSetChanged()
                 switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
+
+                titleInput.setText("")
+            }
+            else {
+                Snackbar.make(findViewById(R.id.MainLayout), mainActivity.getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
             }
 
 
         }
 
+        // CANCEL NEW FILM BUTTON
+        val buttonCancelNewFilm = findViewById<Button>(R.id.button_cancel_new)
         buttonCancelNewFilm.setOnClickListener {
             switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
+            titleInput.setText("")
         }
 
-        genreDropdown.adapter = genreAdapter
-        listView.adapter = filmAdapter
+        // BUTTON SETTINGS
+        val buttonSettings = findViewById<Button>(R.id.buttonSettings)
+        buttonSettings.setOnClickListener {
+            val intent = Intent(mainActivity, SettingsActivity::class.java)
+            this.startActivity(intent)
+        }
+
+        // SYNC BUTTON
+        val buttonSync = findViewById<Button>(R.id.buttonSync)
     }
 
     private fun switchAddWindowVisibility(
