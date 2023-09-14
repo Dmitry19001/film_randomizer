@@ -14,6 +14,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 val defaultFilmList = mutableListOf<Film>(
@@ -64,16 +67,17 @@ class MainActivity : AppCompatActivity() {
         Locale.setDefault(locale)
 
         setContentView(R.layout.activity_main)
-
-        val listView = findViewById<ListView>(R.id.filmList)
-        val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
+        val mainLayout : View = findViewById(R.id.MainLayout)
 
         // Initializing DropBox client
-        val dropBoxIntegration = DropBoxIntegration(this, findViewById(R.id.MainLayout), getString(R.string.apikey))
-        dropBoxIntegration.downloadCSV() {data ->
-            FilmList.addAll(csvToFilms(data))
-            filmAdapter.notifyDataSetChanged()
-        }
+        val dropBoxIntegration = DropBoxIntegration(this, mainLayout, getString(R.string.apikey))
+
+        // Initializing ListView and its Adapter
+        val listView = findViewById<ListView>(R.id.filmList)
+        val filmAdapter = FilmListAdapter(this, FilmList, dropBoxIntegration, mainLayout) // Replace with your data source
+
+        // Making first data sync
+        GlobalScope.launch(Dispatchers.Main) { syncFilmList(dropBoxIntegration, filmAdapter) }
 
         val filmAddNewWindow = findViewById<LinearLayout>(R.id.filmAddNewWindow)
         val genreDropdown = findViewById<Spinner>(R.id.genreDropDown)
@@ -91,25 +95,6 @@ class MainActivity : AppCompatActivity() {
         genreDropdown.adapter = genreAdapter
         listView.adapter = filmAdapter
 
-
-
-        // Show a Snackbar with the selected language
-//        val snackbarMessage = "Selected Language: $selectedLanguage \nDefault: ${Locale.getDefault()}"
-
-//        Snackbar.make(findViewById(R.id.MainLayout), snackbarMessage, Snackbar.LENGTH_SHORT).show()
-
-//        syncSheetData(this.getString(R.string.app_name), this)
-
-
-//        testDropBox(this, findViewById(R.id.MainLayout)) { data ->
-//            // Handle the loaded data here
-//            // For example, update your UI or perform other operations
-//            // with the data returned from Dropbox
-//
-//            FilmList.addAll(csvToFilms(data))
-//            filmAdapter.notifyDataSetChanged()
-//        }
-
     }
 
     private fun initButtons(
@@ -122,7 +107,7 @@ class MainActivity : AppCompatActivity() {
         // ADD NEW FILM BUTTON
         val buttonAddNewFilm = findViewById<Button>(R.id.buttonAddNew)
         buttonAddNewFilm.setOnClickListener {
-            switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
+            switchAddPanelVisibility(filmAddNewWindow, buttonAddNewFilm)
         }
 
         // SUBMIT NEW FILM BUTTON
@@ -135,12 +120,23 @@ class MainActivity : AppCompatActivity() {
             val genre = genreDropdown.selectedItemId.toInt()
 
             if (title.isNotEmpty()) {
-                FilmList.add(Film(title, genre))
+                GlobalScope.launch(Dispatchers.Main) {
+                    syncFilmList(dropBoxIntegration, filmAdapter, false)
 
-                filmAdapter.notifyDataSetChanged()
-                switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
+                    FilmList.add(Film(title, genre))
 
-                titleInput.setText("")
+                    titleInput.setText("")
+
+                    dropBoxIntegration.sendFilmsToCloud(FilmList) { result ->
+                        if (!result) Snackbar.make(findViewById(R.id.MainLayout), mainActivity.getString(R.string.upload_error), Snackbar.LENGTH_SHORT).show()
+
+                        if (result) Snackbar.make(findViewById(R.id.MainLayout), mainActivity.getString(R.string.upload_success), Snackbar.LENGTH_SHORT).show()
+                    }
+
+                    switchAddPanelVisibility(filmAddNewWindow, buttonAddNewFilm)
+
+                    filmAdapter.notifyDataSetChanged()
+                }
             }
             else {
                 Snackbar.make(findViewById(R.id.MainLayout), mainActivity.getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
@@ -152,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         // CANCEL NEW FILM BUTTON
         val buttonCancelNewFilm = findViewById<Button>(R.id.button_cancel_new)
         buttonCancelNewFilm.setOnClickListener {
-            switchAddWindowVisibility(filmAddNewWindow, buttonAddNewFilm)
+            switchAddPanelVisibility(filmAddNewWindow, buttonAddNewFilm)
             titleInput.setText("")
         }
 
@@ -166,16 +162,13 @@ class MainActivity : AppCompatActivity() {
         // SYNC BUTTON
         val buttonSync = findViewById<Button>(R.id.buttonSync)
         buttonSync.setOnClickListener {
-            dropBoxIntegration.downloadCSV() { data ->
-                FilmList.addAll(csvToFilms(data))
-                filmAdapter.notifyDataSetChanged()
+            GlobalScope.launch(Dispatchers.Main) {
+                syncFilmList(dropBoxIntegration, filmAdapter)
             }
-
-            filmAdapter.notifyDataSetChanged()
         }
     }
 
-    private fun switchAddWindowVisibility(
+    private fun switchAddPanelVisibility(
         filmAddNewWindow: LinearLayout,
         buttonAddNewFilm: Button
     ) {
@@ -184,3 +177,15 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
+suspend fun syncFilmList(
+    dropBoxIntegration: DropBoxIntegration,
+    filmAdapter: FilmListAdapter,
+    updateUi : Boolean = true
+) {
+    dropBoxIntegration.downloadCSV() { data ->
+        FilmList.clear()
+        FilmList.addAll(csvToFilms(data))
+
+        if (updateUi) filmAdapter.notifyDataSetChanged()
+    }
+}

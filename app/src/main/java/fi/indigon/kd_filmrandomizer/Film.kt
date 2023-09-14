@@ -5,7 +5,7 @@ import android.content.Context
 
 class Film( var title: String = "Unknown", var genre: Int = 0, var isWatched : Int = 0 ) {
     override fun toString(): String {
-        return super.toString()
+        return "$title,$genre,$isWatched"
     }
 }
 

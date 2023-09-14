@@ -25,4 +25,6 @@
     <string name="no">no</string>
     <string name="add_new_header">add_new_header</string>
     <string name="empty_title_error">empty_title_error</string>
+    <string name="upload_error">uploading_error</string>
+    <string name="upload_success">upload_success</string>
 </resources>

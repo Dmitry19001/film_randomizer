@@ -9,8 +9,12 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-class FilmListAdapter(private val context: Context, private val filmList: MutableList<Film>) : BaseAdapter() {
+class FilmListAdapter(private val context: Context, private val filmList: MutableList<Film>, private val dropBoxIntegration: DropBoxIntegration, private val mainView: View) : BaseAdapter() {
     override fun getCount(): Int {
         return filmList.size
     }
@@ -50,8 +54,24 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
 
         // Handling Delete Button
         buttonDeleteFilm.setOnClickListener {
-            filmList.removeAt(position) // Remove the item from the list
-            notifyDataSetChanged() // Notify the adapter that the data has changed
+            GlobalScope.launch(Dispatchers.Main) {
+
+                syncFilmList(dropBoxIntegration)
+
+                if (filmList.contains(film)) {
+                    // Removing film from list
+                    filmList.remove(film) // Using remove by film in case index has changed after sync
+
+                    notifyDataSetChanged() // Notify the adapter that the data has changed
+
+                    // Sending changes to DropBox
+                    dropBoxIntegration.sendFilmsToCloud(FilmList) { result ->
+                        if (!result) Snackbar.make(mainView, context.getString(R.string.upload_error), Snackbar.LENGTH_SHORT).show()
+
+                        if (result) Snackbar.make(mainView, context.getString(R.string.upload_success), Snackbar.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
 
         listItemView.setOnLongClickListener {
@@ -67,6 +87,15 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
             filmDeletePanel.visibility = View.GONE
         } else {
             filmDeletePanel.visibility = View.VISIBLE
+        }
+    }
+
+    private fun syncFilmList(
+        dropBoxIntegration: DropBoxIntegration,
+    ) {
+        dropBoxIntegration.downloadCSV() { data ->
+            FilmList.clear()
+            FilmList.addAll(csvToFilms(data))
         }
     }
 

@@ -25,4 +25,6 @@
     <string name="no">No</string>
     <string name="add_new_header">Add new film</string>
     <string name="empty_title_error">Title can\'t be empty!</string>
+    <string name="upload_error">Unable to upload changes</string>
+    <string name="upload_success">Success!</string>
 </resources>

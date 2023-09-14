@@ -25,4 +25,6 @@
     <string name="no">Нет</string>
     <string name="add_new_header">Добавить новый фильм</string>
     <string name="empty_title_error">Название не может быть пустым!</string>
+    <string name="upload_error">Ошибка при отправке изменений</string>
+    <string name="upload_success">Успешно отправлено!</string>
 </resources>
