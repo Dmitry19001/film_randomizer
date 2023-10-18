@@ -84,7 +84,7 @@ class RestClient(private val context: Context) {
                 setBody(filmJson.toString())
             }
 
-            val status = response.status
+            var status = response.status
             val responseText = response.readBytes().toString(Charsets.UTF_8)
 
             println("Status $status")
@@ -99,6 +99,9 @@ class RestClient(private val context: Context) {
                         "NOT_FOUND" -> {
                             ResponseCode.NOT_FOUND
                         }
+                        "DELETED" -> {
+                            ResponseCode.SUCCESS
+                        }
                         else -> {
                             ResponseCode.UPLOADED_SUCCESSFULLY
                         }
@@ -109,6 +112,9 @@ class RestClient(private val context: Context) {
                     if (locationHeader != null) {
                         val redirectUrl = URL(locationHeader)
                         val redirectedResponse = client.get(redirectUrl)
+
+                        status = redirectedResponse.status
+
                         if (redirectedResponse.status.value in 200..299) {
                             when (redirectedResponse.readBytes().toString(Charsets.UTF_8)) {
                                 "EXISTS" -> {
@@ -116,6 +122,9 @@ class RestClient(private val context: Context) {
                                 }
                                 "NOT_FOUND" -> {
                                     ResponseCode.NOT_FOUND
+                                }
+                                "DELETED" -> {
+                                    ResponseCode.SUCCESS
                                 }
                                 else -> {
                                     ResponseCode.UPLOADED_SUCCESSFULLY

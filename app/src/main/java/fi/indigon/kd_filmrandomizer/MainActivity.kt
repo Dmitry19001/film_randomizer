@@ -13,8 +13,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -42,7 +40,6 @@ class MainActivity : AppCompatActivity() {
         loadLocalization()
         setContentView(R.layout.activity_main)
 
-        val restClient = RestClient(this);
         val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
         val loadingOverlay = findViewById<FrameLayout>(R.id.loadingOverlay)
 
@@ -55,34 +52,27 @@ class MainActivity : AppCompatActivity() {
         }
 
         filmAdapter.setOnFilmDeleteListener { film ->
-            val coroutineScope = CoroutineScope(Dispatchers.Main) // Use your desired dispatcher
+            val restClient = RestClient(this);
 
-            val job = coroutineScope.launch {
-                try {
-                    restClient.postFilmData(film, ApiAction.DELETE) { isSuccess, responseCode ->
-                        if (isSuccess) {
-                            println("SUCCESS TO DELETE $film")
-                            reloadMainActivity()
-                        } else {
-                            println("ERROR TO DELETE $responseCode $film")
-                        }
+            toggleLoadingOverlay(loadingOverlay, true)
+
+            GlobalScope.launch(Dispatchers.Main) {
+
+                restClient.postFilmData(film, ApiAction.DELETE) { isSuccess, responseCode ->
+                    if (isSuccess) {
+                        println("SUCCESS TO DELETE $film")
+                        reloadMainActivity()
+                    } else {
+                        println("ERROR TO DELETE $responseCode $film")
                     }
-                } catch (e: CancellationException) {
-                    // Handle cancellation if needed
-                    println("Coroutine canceled: $e")
-                } catch (e: Exception) {
-                    // Handle other exceptions if needed
-                    e.printStackTrace()
                 }
             }
-
-            // Make sure to cancel the job when the view is destroyed or no longer needed
-            // For example, in onDestroy() or onStop()
-            // job.cancel() // Uncomment this when appropriate
         }
 
         // Initializing ListView and its Adapter
         val listView = findViewById<ListView>(R.id.filmList)
+
+        val restClient = RestClient(this);
         GlobalScope.launch(Dispatchers.Main) {
             requestFilms(restClient, filmAdapter, loadingOverlay)
         }

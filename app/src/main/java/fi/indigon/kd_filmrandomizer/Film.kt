@@ -80,7 +80,9 @@ fun jsonToFilms(jsonData: JSONArray) : MutableList<Film> {
 
         val genresList: List<Int> = (0 until genresJson.length()).map { genresJson.getInt(it) }
 
-        val film = Film(title, genresList.toIntArray(), isWatched, i)
+        val id = jsonObject.getInt("filmID")
+
+        val film = Film(title, genresList.toIntArray(), isWatched, id)
         filmList.add(film)
     }
 
