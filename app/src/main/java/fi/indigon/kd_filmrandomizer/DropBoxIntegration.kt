@@ -16,8 +16,9 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.InputStreamReader
 
+@Deprecated("Doesn't meet needed requirements, will be replaced with something better!")
 class DropBoxIntegration(private val context: Context, private val view: View, private val accessToken: String) {
-    private val config = DbxRequestConfig.newBuilder("dropbox/java-tutorial").build()
+    private val config = DbxRequestConfig.newBuilder("FilmRandomizer").build()
     private val client = DbxClientV2(config, accessToken)
     fun interface OnDataLoadedListener {
         fun onDataLoaded(data: List<List<String>>)
@@ -34,7 +35,7 @@ class DropBoxIntegration(private val context: Context, private val view: View, p
         // Use coroutines to fetch csv data asynchronously
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                var file = client.files().download("/FilmRanomizerList.csv").inputStream
+                val file = client.files().download("/FilmRandomizerList.csv").inputStream
 
                 // Update the UI with the display name (assuming you have a way to do this)
                 withContext(Dispatchers.Main) {
@@ -60,7 +61,7 @@ class DropBoxIntegration(private val context: Context, private val view: View, p
 
             try {
                 val inputStream = ByteArrayInputStream(csvData.toByteArray())
-                client.files().uploadBuilder("/FilmRanomizerList.csv")
+                client.files().uploadBuilder("/FilmRandomizerList.csv")
                     .withMode(WriteMode.OVERWRITE)
                     .uploadAndFinish(inputStream)
 

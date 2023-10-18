@@ -1,4 +1,3 @@
-package fi.indigon.kd_filmrandomizer
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,12 +8,38 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import fi.indigon.kd_filmrandomizer.Film
+import fi.indigon.kd_filmrandomizer.R
+import kotlinx.coroutines.DelicateCoroutinesApi
 
-class FilmListAdapter(private val context: Context, private val filmList: MutableList<Film>, private val dropBoxIntegration: DropBoxIntegration, private val mainView: View) : BaseAdapter() {
+class FilmListAdapter(
+    private val context: Context,
+    private val filmList: MutableList<Film>,
+) : BaseAdapter() {
+    private var onFilmDeleteListener: OnFilmDeleteListener? = null
+
+    fun interface OnFilmDeleteListener {
+        fun onFilmDeleted(film: Film)
+    }
+
+    private class ViewHolder(view: View) {
+        val titleTextView: TextView
+        val genreTextView: TextView
+        val watchedTextView: TextView
+        val filmDeletePanel: LinearLayout
+        val buttonDeleteFilm: Button
+        val buttonCancelDelete: Button
+
+        init {
+            titleTextView = view.findViewById(R.id.titleTextView)
+            genreTextView = view.findViewById(R.id.genreTextView)
+            watchedTextView = view.findViewById(R.id.watchedTextView)
+            filmDeletePanel = view.findViewById(R.id.filmDeletePanel)
+            buttonDeleteFilm = view.findViewById(R.id.buttonDeleteFilm)
+            buttonCancelDelete = view.findViewById(R.id.buttonCancelFilmDelete)
+        }
+    }
+
     override fun getCount(): Int {
         return filmList.size
     }
@@ -27,25 +52,33 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
         return position.toLong()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val film = getItem(position) as Film
+        val listItemView: View
+        val viewHolder: ViewHolder
 
-        // Inflate the custom layout for each item
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        val listItemView = inflater.inflate(R.layout.list_item_layout, null)
+        if (convertView == null) {
+            val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            listItemView = inflater.inflate(R.layout.list_item_layout, null)
+            viewHolder = ViewHolder(listItemView)
+            listItemView.tag = viewHolder
+        } else {
+            listItemView = convertView
+            viewHolder = listItemView.tag as ViewHolder
+        }
 
-        // Populate the custom layout views with data from the Film object
-        val titleTextView = listItemView.findViewById<TextView>(R.id.titleTextView)
-        val genreTextView = listItemView.findViewById<TextView>(R.id.genreTextView)
-        val watchedTextView = listItemView.findViewById<TextView>(R.id.watchedTextView)
+        viewHolder.titleTextView.text = film.title
+        val genreText = "${context.getString(R.string.genres)}: ${film.genresToString(context)}"
+        viewHolder.genreTextView.text = genreText
+        val watchedText = "${context.getString(R.string.is_watched_header)}: ${
+            if (film.isWatched != 0) context.getString(R.string.yes) else context.getString(R.string.no)
+        }"
+        viewHolder.watchedTextView.text = watchedText
 
-        titleTextView.text = film.title
-        "${context.getString(R.string.genre)}: ${ if (film.genre < getGenres(context).size && film.genre >= 0) getGenres(context)[film.genre] else "@strings/unknown"}".also { genreTextView.text = it }
-        "${context.getString(R.string.is_watched_header)}: ${ if (film.isWatched != 0) context.getString(R.string.yes) else context.getString(R.string.no)}".also { watchedTextView.text = it }
-
-        val filmDeletePanel = listItemView.findViewById<LinearLayout>(R.id.filmDeletePanel)
-        val buttonDeleteFilm = listItemView.findViewById<Button>(R.id.buttonDeleteFilm)
-        val buttonCancelDelete = listItemView.findViewById<Button>(R.id.buttonCancelFilmDelete)
+        val filmDeletePanel = viewHolder.filmDeletePanel
+        val buttonDeleteFilm = viewHolder.buttonDeleteFilm
+        val buttonCancelDelete = viewHolder.buttonCancelDelete
 
         // Handling Cancel Button
         buttonCancelDelete.setOnClickListener {
@@ -54,24 +87,9 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
 
         // Handling Delete Button
         buttonDeleteFilm.setOnClickListener {
-            GlobalScope.launch(Dispatchers.Main) {
+            println("TRYING TO DELETE $film")
 
-                syncFilmList(dropBoxIntegration)
-
-                if (filmList.contains(film)) {
-                    // Removing film from list
-                    filmList.remove(film) // Using remove by film in case index has changed after sync
-
-                    notifyDataSetChanged() // Notify the adapter that the data has changed
-
-                    // Sending changes to DropBox
-                    dropBoxIntegration.sendFilmsToCloud(FilmList) { result ->
-                        if (!result) Snackbar.make(mainView, context.getString(R.string.upload_error), Snackbar.LENGTH_SHORT).show()
-
-                        if (result) Snackbar.make(mainView, context.getString(R.string.upload_success), Snackbar.LENGTH_SHORT).show()
-                    }
-                }
-            }
+            onFilmDeleteListener?.onFilmDeleted(film)
         }
 
         listItemView.setOnLongClickListener {
@@ -82,6 +100,10 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
         return listItemView
     }
 
+    fun setOnFilmDeleteListener(listener: OnFilmDeleteListener?) {
+        onFilmDeleteListener = listener
+    }
+
     private fun switchDeletePanel(filmDeletePanel: LinearLayout) {
         if (filmDeletePanel.isVisible) {
             filmDeletePanel.visibility = View.GONE
@@ -89,15 +111,4 @@ class FilmListAdapter(private val context: Context, private val filmList: Mutabl
             filmDeletePanel.visibility = View.VISIBLE
         }
     }
-
-    private fun syncFilmList(
-        dropBoxIntegration: DropBoxIntegration,
-    ) {
-        dropBoxIntegration.downloadCSV() { data ->
-            FilmList.clear()
-            FilmList.addAll(csvToFilms(data))
-        }
-    }
-
-
 }

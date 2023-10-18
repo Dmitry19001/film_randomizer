@@ -7,8 +7,9 @@
     <string name="genre_documentary">Documentary</string>
     <string name="genre_musical">Musical</string>
     <string name="button_add_new">Add</string>
+    <string name="button_ok">OK</string>
     <string name="film_title">Title</string>
-    <string name="genre">Genre</string>
+    <string name="genres">Genre</string>
     <string name="button_cancel">Cancel</string>
     <string name="genre_science_fiction">Science Fiction</string>
     <string name="genre_crime">Crime</string>
@@ -25,6 +26,11 @@
     <string name="no">No</string>
     <string name="add_new_header">Add new film</string>
     <string name="empty_title_error">Title can\'t be empty!</string>
-    <string name="upload_error">Unable to upload changes</string>
+    <string name="upload_changes_error">Unable to upload changes</string>
     <string name="upload_success">Success!</string>
+    <string name="unknown_genre">Unknown</string>
+    <string name="genres_choose">Choose genres</string>
+    <string name="button_clear_all">Clear All</string>
+    <string name="film_already_exists">Film already exists!</string>
+    <string name="upload_error">ERROR: Unable to upload</string>
 </resources>

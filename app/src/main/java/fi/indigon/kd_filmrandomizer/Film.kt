@@ -1,29 +1,52 @@
 package fi.indigon.kd_filmrandomizer
 
 import android.content.Context
+import org.json.JSONArray
+import org.json.JSONObject
 
 
-class Film( var title: String = "Unknown", var genre: Int = 0, var isWatched : Int = 0 ) {
+class Film {
+    var title: String
+        private set
+    var genres: IntArray
+        private set
+    var isWatched: Int
+        private set
+    var id: Int
+        private set
+
+    constructor(title: String = "Unknown", genres: IntArray = intArrayOf(), isWatched: Int = 0, id: Int = -1) {
+        this.title = title
+        this.genres = genres
+        this.isWatched = isWatched
+        this.id = id
+    }
+
+    fun genresToString(context: Context) : String {
+        return genres.joinToString(", ") { genreId ->
+            val genreName = getGenres(context)[genreId]
+            genreName
+        }
+    }
+
+    fun toJson() : JSONArray{
+        val json = JSONArray(this);
+        // Format: first line empty (,,) and every film is newline
+        println(json);
+        return json;
+    }
+
+
     override fun toString(): String {
-        return "$title,$genre,$isWatched"
+        return "$title,$genres,$isWatched"
     }
 }
 
 fun getGenres(context: Context): Array<String> {
-    return arrayOf(
-        context.getString(R.string.genre_comedy),
-        context.getString(R.string.genre_drama),
-        context.getString(R.string.genre_action),
-        context.getString(R.string.genre_documentary),
-        context.getString(R.string.genre_musical),
-        context.getString(R.string.genre_romance),
-        context.getString(R.string.genre_science_fiction),
-        context.getString(R.string.genre_crime),
-        context.getString(R.string.genre_fantasy),
-        context.getString(R.string.genre_thriller)
-    )
+    return context.resources.getStringArray(R.array.genre_names)
 }
 
+@Deprecated("Will be replaced to JSON!")
 fun csvToFilms(csvData: List<List<String>>) : MutableList<Film> {
     val filmList: MutableList<Film> = mutableListOf()
 
@@ -34,12 +57,49 @@ fun csvToFilms(csvData: List<List<String>>) : MutableList<Film> {
             continue
         }
 
-        filmList.add(Film(i[0], i[1].toInt(), i[2].toInt()))
+        filmList.add(Film(i[0], intArrayOf(i[1].toInt()), i[2].toInt()))
     }
 
     return filmList
 }
 
 
+fun jsonToFilms(jsonData: JSONArray) : MutableList<Film> {
+    val filmList: MutableList<Film> = mutableListOf()
+
+    if (jsonData.length() < 1) return filmList
+
+    for (i in 0 until jsonData.length()) {
+        val jsonObject = jsonData.getJSONObject(i)
+
+        // Process the JSON
+        val title = jsonObject.getString("filmTitle")
+
+        val genresJson = jsonObject.getJSONArray("filmGenresIDs") // Genres
+        val isWatched = jsonObject.getInt("filmIsWatched")
+
+        val genresList: List<Int> = (0 until genresJson.length()).map { genresJson.getInt(it) }
+
+        val film = Film(title, genresList.toIntArray(), isWatched, i)
+        filmList.add(film)
+    }
+
+    return filmList
+}
+
+fun filmToJson(film: Film, apiAction : String = "ADD") : JSONObject {
+    val filmJson = JSONObject().apply {
+        put("apiAction", apiAction)
+        put("filmTitle", film.title)
+        put("filmGenresIDs", JSONArray(film.genres))
+    }
+
+    if (apiAction != "ADD") {
+        filmJson.put("filmID", film.id)
+        filmJson.put("filmIsWatched", film.isWatched)
+    }
+
+    return filmJson
+}
 
 

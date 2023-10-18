@@ -7,8 +7,9 @@
     <string name="genre_documentary">Документальный</string>
     <string name="genre_musical">Мюзикл</string>
     <string name="button_add_new">Добавить</string>
+    <string name="button_ok">OK</string>
     <string name="film_title">Название</string>
-    <string name="genre">Жанр</string>
+    <string name="genres">Жанр</string>
     <string name="button_cancel">Отмена</string>
     <string name="genre_science_fiction">Научная фантастика</string>
     <string name="genre_crime">Криминал</string>
@@ -25,6 +26,11 @@
     <string name="no">Нет</string>
     <string name="add_new_header">Добавить новый фильм</string>
     <string name="empty_title_error">Название не может быть пустым!</string>
-    <string name="upload_error">Ошибка при отправке изменений</string>
-    <string name="upload_success">Успешно отправлено!</string>
+    <string name="upload_changes_error">Ошибка при отправке изменений</string>
+    <string name="upload_success">Успешно выполнено!</string>
+    <string name="unknown_genre">Неизвестно</string>
+    <string name="genres_choose">Выбрать жанры</string>
+    <string name="button_clear_all">Очистить выбор</string>
+    <string name="film_already_exists">Такой фильм уже есть!</string>
+    <string name="upload_error">ERROR: Unable to upload</string>
 </resources>
