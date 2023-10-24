@@ -34,4 +34,11 @@
     <string name="genres_choose">Choose genres</string>
     <string name="film_already_exists">Film already exists!</string>
     <string name="upload_error">ERROR: Unable to upload</string>
+    <string name="app_version" translatable="false">0.1.2_Alpha</string>
+    <string name="settings_info_title" translatable="false">App information</string>
+    <string name="setting_app_version_title" translatable="false">App version</string>
+    <string name="title_activity_randomizer" translatable="false">RandomizerActivity</string>
+    <string name="genre_series">Series</string>
+    <string name="genre_animation">Animation</string>
+    <string name="empty_genre_error">There is too few genres!</string>
 </resources>

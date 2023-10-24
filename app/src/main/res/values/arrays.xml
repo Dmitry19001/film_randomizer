@@ -18,5 +18,7 @@
         <item>@string/genre_crime</item>
         <item>@string/genre_fantasy</item>
         <item>@string/genre_thriller</item>
+        <item>@string/genre_series</item>
+        <item>@string/genre_animation</item>
     </string-array>
 </resources>

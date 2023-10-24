@@ -74,8 +74,6 @@ class AddNewFilmActivity : ComponentActivity() {
         initMultipleGenreChoiceWidget()
 
         buttonSubmitNewFilm.setOnClickListener {
-            // TODO CHECK IF FILM ALREADY EXISTS
-
             val title = titleInput.text.toString()
 
             val genres = selectedGenres.mapIndexed{ index, value ->
@@ -84,7 +82,7 @@ class AddNewFilmActivity : ComponentActivity() {
                 .filterNotNull() // Filtering out null values
                 .toIntArray()
 
-            if (title.isNotEmpty()) {
+            if (title.isNotEmpty() && genres.isNotEmpty()) {
 
                 toggleLoadingOverlay(loadingOverlay, true)
 
@@ -111,7 +109,9 @@ class AddNewFilmActivity : ComponentActivity() {
                 }
             }
             else {
-                Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
+                if (title.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
+
+                if (genres.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_genre_error), Snackbar.LENGTH_SHORT).show()
             }
         }
 

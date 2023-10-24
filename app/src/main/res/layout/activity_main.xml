@@ -12,29 +12,30 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/filmsLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/topMenuPanel">
 
         <ListView
             android:id="@+id/filmList"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/constraintLayout"
+            app:layout_constraintBottom_toTopOf="@+id/essentialButtonsPanel"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            >
 
         </ListView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
+            android:id="@+id/essentialButtonsPanel"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="65dp"
             android:maxHeight="75dp"
             android:minHeight="75dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -47,7 +48,7 @@
                 android:id="@+id/buttonSync"
                 style="@style/Widget.Material3.Button.IconButton.Filled"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/sync_header"
                 android:insetLeft="-1dp"
                 android:insetTop="0dp"
@@ -58,24 +59,24 @@
                 app:iconGravity="textEnd"
                 app:iconSize="40dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/buttonSettings"
+                app:layout_constraintEnd_toStartOf="@+id/buttonRandom"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:strokeColor="@color/black"
                 app:strokeWidth="1dp" />
 
             <Button
-                android:id="@+id/buttonSettings"
+                android:id="@+id/buttonRandom"
                 style="@style/Widget.Material3.Button.IconButton.Filled"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="match_parent"
                 android:contentDescription="@string/title_activity_settings"
                 android:insetLeft="-1dp"
                 android:insetTop="0dp"
                 android:insetRight="-1dp"
                 android:insetBottom="0dp"
                 app:cornerRadius="0dp"
-                app:icon="@drawable/settings"
+                app:icon="@drawable/random"
                 app:iconGravity="textEnd"
                 app:iconSize="40dp"
                 app:iconTint="#FFFFFF"
@@ -94,7 +95,7 @@
         android:layout_height="75dp"
         android:layout_gravity="center|end"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="75dp"
         android:contentDescription="@string/button_add_new"
         android:insetTop="0dp"
         android:insetBottom="0dp"
@@ -108,14 +109,29 @@
         app:strokeColor="@color/black"
         app:strokeWidth="1dp" />
 
-    <TextView
-        android:id="@+id/debug_text"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/filmsLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/topMenuPanel"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="?attr/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/buttonSettings"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="6dp"
+            app:icon="@drawable/settings"
+            app:iconGravity="textEnd"
+            app:iconSize="40dp"
+            app:iconTint="#FFFFFF"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
         android:id="@+id/loadingOverlay"
@@ -137,6 +153,5 @@
             tools:visibility="visible" />
 
     </FrameLayout>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

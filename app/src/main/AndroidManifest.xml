@@ -18,9 +18,9 @@
         <activity
             android:name=".AddNewFilmActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"
             android:label="@string/title_activity_add_new_film"
-            android:theme="@style/Theme.KD_FilmRandomizer" />
+            android:theme="@style/Theme.KD_FilmRandomizer"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"
             android:exported="false"

@@ -33,4 +33,7 @@
     <string name="button_clear_all">Очистить выбор</string>
     <string name="film_already_exists">Такой фильм уже есть!</string>
     <string name="upload_error">ERROR: Unable to upload</string>
+    <string name="genre_series">Сериал</string>
+    <string name="genre_animation">Анимация</string>
+    <string name="empty_genre_error">Нужно добавить хотя-бы один жанр!</string>
 </resources>

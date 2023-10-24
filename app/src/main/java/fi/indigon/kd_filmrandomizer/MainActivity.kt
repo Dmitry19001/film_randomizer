@@ -111,6 +111,7 @@ class MainActivity : AppCompatActivity() {
         restClient.getFilmsData { data ->
             // Process the JSON data here
             if (data == null){
+                toggleLoadingOverlay(loadingOverlay, false)
                 return@getFilmsData
             }
 

@@ -33,4 +33,7 @@
     <string name="button_clear_all">Clear All</string>
     <string name="film_already_exists">Film already exists!</string>
     <string name="upload_error">ERROR: Unable to upload</string>
+    <string name="genre_series">Series</string>
+    <string name="genre_animation">Animation</string>
+    <string name="empty_genre_error">There is too few genres!</string>
 </resources>
