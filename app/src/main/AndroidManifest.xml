@@ -16,6 +16,11 @@
         android:theme="@style/Theme.KD_FilmRandomizer"
         tools:targetApi="31">
         <activity
+            android:name=".RandomizerActivity"
+            android:exported="false"
+            android:label="@string/title_activity_randomizer"
+            android:theme="@style/Theme.KD_FilmRandomizer" />
+        <activity
             android:name=".AddNewFilmActivity"
             android:exported="false"
             android:label="@string/title_activity_add_new_film"

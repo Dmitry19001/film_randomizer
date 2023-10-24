@@ -179,5 +179,11 @@ class MainActivity : AppCompatActivity() {
         buttonSync.setOnClickListener {
             reloadMainActivity()
         }
+
+        val buttonRandom = findViewById<Button>(R.id.buttonRandom)
+        buttonRandom.setOnClickListener {
+            val intent = Intent(this, RandomizerActivity::class.java)
+            this.startActivity(intent)
+        }
     }
 }
