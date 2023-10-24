@@ -1,6 +1,5 @@
 <resources>
     <string name="welcome_message">welcome_message</string>
-    <string name="app_name" translatable="false">fi.indigon.kd_filmrandomizer</string>
     <string name="genre_comedy">Comedy</string>
     <string name="genre_drama">Drama</string>
     <string name="genre_action">Action</string>
@@ -27,18 +26,24 @@
     <string name="no">No</string>
     <string name="add_new_header">Add new film</string>
     <string name="empty_title_error">Title can\'t be empty!</string>
-    <string name="upload_changes_error">Unable to upload changes</string>
+    <string name="error_upload_changes">Unable to upload changes</string>
     <string name="upload_success">Success!</string>
     <string name="unknown_genre">Unknown</string>
     <string name="title_activity_add_new_film" translatable="false">AddNewFilmActivity</string>
     <string name="genres_choose">Choose genres</string>
     <string name="film_already_exists">Film already exists!</string>
     <string name="upload_error">ERROR: Unable to upload</string>
-    <string name="app_version" translatable="false">0.1.2_Alpha</string>
-    <string name="settings_info_title" translatable="false">App information</string>
-    <string name="setting_app_version_title" translatable="false">App version</string>
+    <string name="app_version" translatable="false">0.2_Alpha</string>
+    <string name="settings_info_title">App information</string>
+    <string name="setting_app_version_title">App version</string>
     <string name="title_activity_randomizer" translatable="false">RandomizerActivity</string>
     <string name="genre_series">Series</string>
     <string name="genre_animation">Animation</string>
-    <string name="empty_genre_error">There is too few genres!</string>
+    <string name="error_empty_genre">There is too few genres!</string>
+    <string name="setting_googleSheet_URL">Here goes link to your Google Sheet</string>
+    <string name="setting_googleSheet_URL_title">Google Sheet URL</string>
+    <string name="error_undefined_sheetUrl">Undefined Google Sheet URL. Please define it in settings to continue!</string>
+    <string name="app_name">FilmRandomizer</string>
+    <string name="button_randomize" translatable="false">Randomize</string>
+    <string name="random_result_title">Result</string>
 </resources>

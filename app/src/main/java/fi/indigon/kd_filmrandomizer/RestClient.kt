@@ -4,6 +4,7 @@ import android.content.Context
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.readBytes
@@ -31,7 +32,7 @@ enum class ResponseCode {
     NOT_FOUND;
 }
 
-class RestClient(private val context: Context) {
+class RestClient(private val context: Context, private val sheetURL: String) {
     private val client = HttpClient(OkHttp)
     private val apiURL = URL(context.getString(R.string.RESTApiLink))
 
@@ -49,11 +50,13 @@ class RestClient(private val context: Context) {
                 url {
                     protocol = URLProtocol.HTTPS
                 }
+                parameter("sheetURL", sheetURL)
             }
 
             when (response.status.value) {
                 in 200..299 -> {
                     val responseBody = response.readBytes().toString(Charsets.UTF_8)
+                    println(responseBody)
                     val jsonArray = if (responseBody.isNotEmpty()) JSONArray(responseBody) else null
                     callback.onDataLoaded(jsonArray)
                 }
@@ -71,9 +74,7 @@ class RestClient(private val context: Context) {
 
     suspend fun postFilmData(film: Film, apiAction: ApiAction, callback: OnDataUploadedListener) {
         try {
-            val filmJson = filmToJson(film, apiAction.toString())
-
-            println(filmJson)
+            val filmJson = filmToJson(film, apiAction.toString(), sheetURL)
 
             val response = client.post(apiURL) {
                 url {

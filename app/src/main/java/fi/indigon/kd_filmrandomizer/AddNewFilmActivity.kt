@@ -1,6 +1,6 @@
 package fi.indigon.kd_filmrandomizer
 
-import android.content.DialogInterface
+import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
@@ -9,17 +9,19 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.activity.ComponentActivity
-import androidx.appcompat.app.AlertDialog.Builder
+import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.Collections.sort
 
 class AddNewFilmActivity : ComponentActivity() {
+
+    private var sheetURL = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loadGoogleSheetUrl()
 
         setContentView(R.layout.add_new_film_activity)
 
@@ -27,6 +29,17 @@ class AddNewFilmActivity : ComponentActivity() {
         makeAdjustableView()
 
         initUI()
+    }
+
+    private fun loadGoogleSheetUrl() {
+        val sharedPreferences: SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(this)
+        val url = sharedPreferences.getString("setting_sheet_url", "") ?: ""
+
+        if (url.isNotEmpty())
+        {
+            sheetURL = url
+        }
     }
 
     private fun makeAdjustableView() {
@@ -63,20 +76,21 @@ class AddNewFilmActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     private fun initUI() {
         // SUBMIT NEW FILM BUTTON
         val titleInput = findViewById<EditText>(R.id.newFilmTitle)
         val buttonSubmitNewFilm = findViewById<Button>(R.id.button_submit_new)
-        val restClient = RestClient(this);
+        val restClient = RestClient(this, sheetURL)
         val loadingOverlay = findViewById<View>(R.id.loadingOverlay)
 
-        initMultipleGenreChoiceWidget()
+        val multipleChoice = findViewById<TextView>(R.id.genresMultiselect)
+
+        val multipleGenreChoiceWidget = MultipleGenreChoiceWidget(this, multipleChoice)
 
         buttonSubmitNewFilm.setOnClickListener {
             val title = titleInput.text.toString()
 
-            val genres = selectedGenres.mapIndexed{ index, value ->
+            val genres = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed{ index, value ->
                 if (value) index // If true adding index = genreID to array
                 else null }
                 .filterNotNull() // Filtering out null values
@@ -111,7 +125,7 @@ class AddNewFilmActivity : ComponentActivity() {
             else {
                 if (title.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
 
-                if (genres.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_genre_error), Snackbar.LENGTH_SHORT).show()
+                if (genres.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.error_empty_genre), Snackbar.LENGTH_SHORT).show()
             }
         }
 
@@ -124,91 +138,13 @@ class AddNewFilmActivity : ComponentActivity() {
         }
     }
 
-    private var selectedGenres: BooleanArray = booleanArrayOf()
-
-    private fun initMultipleGenreChoiceWidget() {
-        // assign variable
-        val textView = findViewById<TextView>(R.id.genresMultiselect)
-        val selectedGenresList = arrayListOf<Int>()
-
-        // Getting genres
-        val genres = getGenres(this)
-
-        // initialize selected language array
-        selectedGenres = BooleanArray(genres.count())
-
-        textView.setOnClickListener { // Initialize alert dialog
-            val builder = Builder(this@AddNewFilmActivity)
-
-            // set title
-            builder.setTitle(getString(R.string.genres_choose))
-
-            // set dialog non cancelable
-            builder.setCancelable(false)
-            builder.setMultiChoiceItems(
-                genres, selectedGenres
-            ) { _, i, b ->
-                // check condition
-                if (b) {
-                    // when checkbox selected
-                    // Add position  in lang list
-                    selectedGenresList.add(i)
-                    // Sort array list
-                    sort(selectedGenresList)
-                } else {
-                    // when checkbox unselected
-                    // Remove position from langList
-                    selectedGenresList.remove(Integer.valueOf(i))
-                }
-            }
-            builder.setPositiveButton(
-                getString(R.string.button_ok)
-            ) { _, _ -> // Initialize string builder
-                val stringBuilder = StringBuilder()
-                // use for loop
-                for (j in 0 until selectedGenresList.count()) {
-                    // concat array value
-                    stringBuilder.append(genres[selectedGenresList[j]])
-                    // check condition
-                    if (j != (selectedGenresList.count() - 1)) {
-                        // When j value  not equal
-                        // to lang list size - 1
-                        // add comma
-                        stringBuilder.append(", ")
-                    }
-                }
-                // set text on textView
-                textView.text = stringBuilder.toString()
-            }
-            builder.setNegativeButton(getString(R.string.button_cancel),
-                DialogInterface.OnClickListener { dialogInterface, i -> // dismiss dialog
-                    dialogInterface.dismiss()
-                })
-            builder.setNeutralButton(
-                getString(R.string.button_clear_all)
-            ) { _, _ ->
-                // use for loop
-                for (j in 0 until selectedGenres.count()) {
-                    // remove all selection
-                    selectedGenres[j] = false
-                    // clear language list
-                    selectedGenresList.clear()
-                    // clear text view value
-                    textView.text = ""
-                }
-            }
-            // show dialog
-            builder.show()
-        }
-    }
-
     private fun toggleLoadingOverlay(loadingOverlay: View, state: Boolean) {
         if (state){
             loadingOverlay.visibility = View.VISIBLE
 
             window.setFlags(
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         }
         else {
             loadingOverlay.visibility = View.GONE

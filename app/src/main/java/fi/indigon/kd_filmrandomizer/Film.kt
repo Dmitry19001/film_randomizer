@@ -5,22 +5,20 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 
-class Film {
-    var title: String
+class Film(
+    title: String = "Unknown",
+    genres: IntArray = intArrayOf(),
+    isWatched: Int = 0,
+    id: Int = -1
+) {
+    var title: String = title
         private set
-    var genres: IntArray
+    var genres: IntArray = genres
         private set
-    var isWatched: Int
+    var isWatched: Int = isWatched
         private set
-    var id: Int
+    var id: Int = id
         private set
-
-    constructor(title: String = "Unknown", genres: IntArray = intArrayOf(), isWatched: Int = 0, id: Int = -1) {
-        this.title = title
-        this.genres = genres
-        this.isWatched = isWatched
-        this.id = id
-    }
 
     fun genresToString(context: Context) : String {
         return genres.joinToString(", ") { genreId ->
@@ -89,9 +87,10 @@ fun jsonToFilms(jsonData: JSONArray) : MutableList<Film> {
     return filmList
 }
 
-fun filmToJson(film: Film, apiAction : String = "ADD") : JSONObject {
+fun filmToJson(film: Film, apiAction : String = "ADD", sheetURL: String) : JSONObject {
     val filmJson = JSONObject().apply {
         put("apiAction", apiAction)
+        put("sheetURL", sheetURL)
         put("filmTitle", film.title)
         put("filmGenresIDs", JSONArray(film.genres))
     }

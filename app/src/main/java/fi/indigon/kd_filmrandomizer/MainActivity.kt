@@ -13,7 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import kotlinx.coroutines.DelicateCoroutinesApi
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -32,12 +32,16 @@ import java.util.Locale
 
 val FilmList = mutableListOf<Film>()
 
+
 class MainActivity : AppCompatActivity() {
 
-    @OptIn(DelicateCoroutinesApi::class)
+    private var sheetURL = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loadGoogleSheetUrl()
         loadLocalization()
+
         setContentView(R.layout.activity_main)
 
         val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
@@ -45,14 +49,14 @@ class MainActivity : AppCompatActivity() {
 
         toggleLoadingOverlay(loadingOverlay, true)
 
-        // On add activity close
+        // On addNewFilm activity close
         addNewFilmActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
             // Reloading main activity to get new film list
             reloadMainActivity()
         }
 
         filmAdapter.setOnFilmDeleteListener { film ->
-            val restClient = RestClient(this);
+            val restClient = RestClient(this, sheetURL);
 
             toggleLoadingOverlay(loadingOverlay, true)
 
@@ -72,11 +76,17 @@ class MainActivity : AppCompatActivity() {
         // Initializing ListView and its Adapter
         val listView = findViewById<ListView>(R.id.filmList)
 
-        val restClient = RestClient(this);
-        GlobalScope.launch(Dispatchers.Main) {
-            requestFilms(restClient, filmAdapter, loadingOverlay)
+        if (sheetURL.isNotEmpty()) {
+            val restClient = RestClient(this, sheetURL);
+            GlobalScope.launch(Dispatchers.Main) {
+                requestFilms(restClient, filmAdapter, loadingOverlay)
+            }
         }
-
+        else {
+            toggleLoadingOverlay(loadingOverlay, false)
+            Snackbar.make(findViewById(R.id.MainLayout), getString(R.string.error_undefined_sheetUrl), Snackbar.LENGTH_SHORT)
+                .show()
+        }
         // Initializing buttons
         initButtons()
 
@@ -123,11 +133,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun loadGoogleSheetUrl() {
+        val sharedPreferences: SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(this)
+        val url = sharedPreferences.getString("setting_sheet_url", "")
+
+        if (!url.isNullOrEmpty())
+        {
+            println("URL FOUND: $url")
+            sheetURL = url
+            return
+        }
+
+        println("WTF")
+    }
+
     private fun loadLocalization() {
         // Get the selected language from SharedPreferences
         val sharedPreferences: SharedPreferences =
             PreferenceManager.getDefaultSharedPreferences(this)
-        val selectedLanguage = sharedPreferences.getString("app_language", "ru") ?: "ru"
+        val selectedLanguage = sharedPreferences.getString("setting_app_language", "ru") ?: "ru"
         val locale = Locale(selectedLanguage)
         Locale.setDefault(locale)
     }

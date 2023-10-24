@@ -3,13 +3,21 @@
 
     <PreferenceCategory app:title="@string/main_settings_header">
 
+        <EditTextPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/setting_googleSheet_URL_title"
+            app:key="setting_sheet_url"
+            app:summary="@string/setting_googleSheet_URL" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:defaultValue="ru"
             android:entries="@array/supported_languages"
             android:entryValues="@array/supported_language_values"
-            android:key="app_language"
+            android:key="setting_app_language"
             android:title="@string/language_setting_title"
             app:summary="ru" />
 
@@ -22,7 +30,6 @@
         <EditTextPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:defaultValue="Default value"
             android:recycleEnabled="false"
             android:selectAllOnFocus="true"
             android:singleLine="true"
