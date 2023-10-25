@@ -72,7 +72,7 @@ class FilmListAdapter(
         val genreText = "${context.getString(R.string.genres)}: ${film.genresToString(context)}"
         viewHolder.genreTextView.text = genreText
         val watchedText = "${context.getString(R.string.is_watched_header)}: ${
-            if (film.isWatched != 0) context.getString(R.string.yes) else context.getString(R.string.no)
+            if (film.isWatched) context.getString(R.string.yes) else context.getString(R.string.no)
         }"
         viewHolder.watchedTextView.text = watchedText
 

@@ -7,14 +7,17 @@ import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.readBytes
 import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.net.URL
 
-enum class ApiAction {
+enum class APIAction {
     ADD,
     EDIT,
     DELETE;
@@ -72,82 +75,63 @@ class RestClient(private val context: Context, private val sheetURL: String) {
         }
     }
 
-    suspend fun postFilmData(film: Film, apiAction: ApiAction, callback: OnDataUploadedListener) {
-        try {
-            val filmJson = filmToJson(film, apiAction.toString(), sheetURL)
+    private suspend fun handleRedirection(response: HttpResponse): HttpResponse {
+        val locationHeader = response.headers["Location"]
+        return if (locationHeader != null) {
+            val redirectUrl = URL(locationHeader)
+            client.get(redirectUrl)
+        } else {
+            response
+        }
+    }
 
-            val response = client.post(apiURL) {
-                url {
-                    protocol = URLProtocol.HTTPS
+    private suspend fun parseResponse(response: HttpResponse): Pair<Boolean, ResponseCode> {
+        val status = response.status
+        val responseText = response.readBytes().toString(Charsets.UTF_8)
+
+        println("Status $status")
+        println("ResponseText $responseText")
+
+        val responseCode = when (status.value) {
+            in 200..299 -> {
+                when (responseText) {
+                    "EXISTS" -> ResponseCode.ALREADY_EXISTS
+                    "NOT_FOUND" -> ResponseCode.NOT_FOUND
+                    "DELETED" -> ResponseCode.SUCCESS
+                    else -> ResponseCode.UPLOADED_SUCCESSFULLY
                 }
-
-                contentType(ContentType.Application.Json)
-                setBody(filmJson.toString())
             }
+            404 -> ResponseCode.NOT_FOUND
+            else -> ResponseCode.UNKNOWN_ERROR
+        }
 
-            var status = response.status
-            val responseText = response.readBytes().toString(Charsets.UTF_8)
+        return Pair(status.value in 200..299, responseCode)
+    }
 
-            println("Status $status")
-            println("ResponseText $responseText")
-
-            val responseCode = when (status.value) {
-                in 200..299 -> {
-                    when (responseText) {
-                        "EXISTS" -> {
-                            ResponseCode.ALREADY_EXISTS
-                        }
-                        "NOT_FOUND" -> {
-                            ResponseCode.NOT_FOUND
-                        }
-                        "DELETED" -> {
-                            ResponseCode.SUCCESS
-                        }
-                        else -> {
-                            ResponseCode.UPLOADED_SUCCESSFULLY
-                        }
+    suspend fun postFilmData(film: Film, apiAction: APIAction): Pair<Boolean, ResponseCode> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val initialResponse = client.post(apiURL) {
+                    url {
+                        protocol = URLProtocol.HTTPS
                     }
+                    contentType(ContentType.Application.Json)
+                    setBody(film.toJson(apiAction, sheetURL).toString())
                 }
-                in 300..399 -> {
-                    val locationHeader = response.headers["Location"]
-                    if (locationHeader != null) {
-                        val redirectUrl = URL(locationHeader)
-                        val redirectedResponse = client.get(redirectUrl)
 
-                        status = redirectedResponse.status
-
-                        if (redirectedResponse.status.value in 200..299) {
-                            when (redirectedResponse.readBytes().toString(Charsets.UTF_8)) {
-                                "EXISTS" -> {
-                                    ResponseCode.ALREADY_EXISTS
-                                }
-                                "NOT_FOUND" -> {
-                                    ResponseCode.NOT_FOUND
-                                }
-                                "DELETED" -> {
-                                    ResponseCode.SUCCESS
-                                }
-                                else -> {
-                                    ResponseCode.UPLOADED_SUCCESSFULLY
-                                }
-                            }
-                        } else {
-                            ResponseCode.UNKNOWN_ERROR
-                        }
-                    } else {
-                        ResponseCode.UNKNOWN_ERROR
-                    }
+                val finalResponse = if (initialResponse.status.value in 300..399) {
+                    handleRedirection(initialResponse)
+                } else {
+                    initialResponse
                 }
-                404 -> ResponseCode.NOT_FOUND
-                else -> ResponseCode.UNKNOWN_ERROR
+
+                parseResponse(finalResponse)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Pair(false, ResponseCode.UNKNOWN_ERROR)
+            } finally {
+                client.close()
             }
-
-            callback.onDataUploaded(status.value in 200..299, responseCode)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            callback.onDataUploaded(false, ResponseCode.UNKNOWN_ERROR)
-        } finally {
-            client.close()
         }
     }
 }

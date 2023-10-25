@@ -58,6 +58,9 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference-ktx:1.2.0")
 
+    // Coroutines
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+
     //MaterialDesign
     implementation ("androidx.compose.material3:material3:1.1.2")
     implementation ("androidx.compose.material3:material3-window-size-class:1.1.2")

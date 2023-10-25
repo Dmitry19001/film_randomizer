@@ -12,34 +12,23 @@ import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.Locale
-
-//0 genre_comedy,
-//1 genre_drama,
-//2 genre_action,
-//3 genre_documentary,
-//4 genre_musical,
-//5 genre_romance,
-//6 genre_science_fiction,
-//7 genre_crime,
-//8 genre_fantasy
-//9 genre_thriller
 
 val FilmList = mutableListOf<Film>()
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(){
 
     private var sheetURL = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        loadGoogleSheetUrl()
+        sheetURL = PreferenceUtils.getGoogleSheetUrl(this)
         loadLocalization()
 
         setContentView(R.layout.activity_main)
@@ -60,15 +49,13 @@ class MainActivity : AppCompatActivity() {
 
             toggleLoadingOverlay(loadingOverlay, true)
 
-            GlobalScope.launch(Dispatchers.Main) {
-
-                restClient.postFilmData(film, ApiAction.DELETE) { isSuccess, responseCode ->
-                    if (isSuccess) {
-                        println("SUCCESS TO DELETE $film")
-                        reloadMainActivity()
-                    } else {
-                        println("ERROR TO DELETE $responseCode $film")
-                    }
+            lifecycleScope.launch(Dispatchers.Main) {
+                val (isDone, responseCode) = restClient.postFilmData(film, APIAction.DELETE)
+                if (isDone) {
+                    println("SUCCESS TO DELETE $film")
+                    reloadMainActivity()
+                } else {
+                    println("ERROR TO DELETE $responseCode $film")
                 }
             }
         }
@@ -78,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
         if (sheetURL.isNotEmpty()) {
             val restClient = RestClient(this, sheetURL);
-            GlobalScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Main) {
                 requestFilms(restClient, filmAdapter, loadingOverlay)
             }
         }
@@ -118,34 +105,19 @@ class MainActivity : AppCompatActivity() {
 
 
     private suspend fun requestFilms(restClient: RestClient, filmAdapter: FilmListAdapter, loadingOverlay : View) {
-        restClient.getFilmsData { data ->
+        restClient.getFilmsData { json ->
             // Process the JSON data here
-            if (data == null){
+            if (json == null){
                 toggleLoadingOverlay(loadingOverlay, false)
                 return@getFilmsData
             }
 
             FilmList.clear()
-            FilmList.addAll(jsonToFilms(data))
+            FilmList.addAll(FilmUtils.jsonToFilms(json))
 
             filmAdapter.notifyDataSetChanged()
             toggleLoadingOverlay(loadingOverlay, false)
         }
-    }
-
-    private fun loadGoogleSheetUrl() {
-        val sharedPreferences: SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(this)
-        val url = sharedPreferences.getString("setting_sheet_url", "")
-
-        if (!url.isNullOrEmpty())
-        {
-            println("URL FOUND: $url")
-            sheetURL = url
-            return
-        }
-
-        println("WTF")
     }
 
     private fun loadLocalization() {

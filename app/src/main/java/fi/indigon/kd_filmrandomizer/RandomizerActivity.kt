@@ -14,12 +14,7 @@ class RandomizerActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_randomizer)
 
-//        val carouselRecyclerView = findViewById<RecyclerView>(R.id.carousel_recycler_view)
-//        carouselRecyclerView.setLayoutManager(CarouselLayoutManager())
-
         initUI()
-
-        //Toast.makeText(this, "NE RABOTAET POKA!!!", Toast.LENGTH_SHORT).show()
     }
 
     private fun initUI() {
@@ -30,30 +25,24 @@ class RandomizerActivity : ComponentActivity() {
 
         buttonRandomize.setOnClickListener {
             // getting chosen genres for filtering
-            val genres = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed{ index, value ->
+            val genreIds = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed{ index, value ->
                 if (value) index // If true adding index = genreID to array
                 else null }
                 .filterNotNull() // Filtering out null values
                 .toIntArray()
 
-            val filmList = mutableListOf<Film>()
-
-            if (genres.isNotEmpty()) {
-                for (film in FilmList) {
+            val filmList = if (genreIds.isNotEmpty()) {
+                FilmList.filter { film ->
                     // Finding any same genre
-                    val containsGenres = film.genres.any{ genre ->
-                        genres.any { chosenGenre ->
-                            genre == chosenGenre
+                    film.genres.any{ genre ->
+                        genreIds.any { chosenGenre ->
+                            genre.id == chosenGenre
                         }
-                    }
-
-                    if (containsGenres) {
-                        filmList.add(film) // Adding to new list
                     }
                 }
             }
             else {
-                filmList.addAll(FilmList) // No sorting
+                FilmList // No sorting
             }
 
             Snackbar.make(findViewById(R.id.randomizerLayout), "${FilmList.count() - filmList.count()} was filtered out of ${FilmList.count()} films", Snackbar.LENGTH_SHORT).show()
@@ -63,36 +52,18 @@ class RandomizerActivity : ComponentActivity() {
                 return@setOnClickListener
             }
 
-
-            val random = Random(generateRandomSeed())
-            val randomIndex = random.nextInt(0, filmList.count())
+            val randomIndex = Random.nextInt(0, filmList.count())
 
             showOkDialog(this, getString(R.string.random_result_title), filmList[randomIndex].title)
         }
     }
 
     private fun showOkDialog(context: Context, title: String, message: String) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(title)
-        builder.setMessage(message)
-
-        // Add an "OK" button
-        builder.setPositiveButton("OK") { dialog, _ ->
-            dialog.dismiss()
-        }
-
-        val dialog = builder.create()
-        dialog.show()
+        AlertDialog.Builder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .show()
     }
-    private fun generateRandomSeed(): Long {
-        val currentTimeMillis = System.currentTimeMillis()
-        val seconds = (currentTimeMillis / 1000) % 60
-        val hours = (currentTimeMillis / (1000 * 60 * 60)) % 24
-
-        // Concatenate the values and return
-
-        return "$currentTimeMillis$seconds$hours".toLong()
-    }
-
 }
 

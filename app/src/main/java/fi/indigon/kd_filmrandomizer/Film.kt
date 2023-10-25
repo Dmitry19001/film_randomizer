@@ -5,102 +5,92 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 
-class Film(
-    title: String = "Unknown",
-    genres: IntArray = intArrayOf(),
-    isWatched: Int = 0,
-    id: Int = -1
+data class Film(
+    val title: String = "Unknown",
+    val genres: List<Genre> = emptyList(),
+    val isWatched: Boolean = false,
+    val id: Int = -1
 ) {
-    var title: String = title
-        private set
-    var genres: IntArray = genres
-        private set
-    var isWatched: Int = isWatched
-        private set
-    var id: Int = id
-        private set
+    enum class Genre(val id: Int, val stringResId: Int) {
+        COMEDY(0, R.string.genre_comedy),
+        DRAMA(1, R.string.genre_drama),
+        ACTION(2, R.string.genre_action),
+        DOCUMENTARY(3, R.string.genre_documentary),
+        MUSICAL(4, R.string.genre_musical),
+        ROMANCE(5, R.string.genre_romance),
+        SCIENCE_FICTION(6, R.string.genre_science_fiction),
+        CRIME(7, R.string.genre_crime),
+        FANTASY(8, R.string.genre_fantasy),
+        THRILLER(9, R.string.genre_thriller),
+        SERIES(10, R.string.genre_series),
+        ANIMATION(11, R.string.genre_animation);
 
-    fun genresToString(context: Context) : String {
-        return genres.joinToString(", ") { genreId ->
-            val genreName = getGenres(context)[genreId]
-            genreName
+        companion object {
+            fun fromId(id: Int): Genre = values().find { it.id == id } ?: throw IllegalArgumentException("Invalid genre ID")
+
+            fun getAll(): Array<Genre> = values()
+        }
+
+        fun getDisplayName(context: Context): String {
+            return context.getString(stringResId)
         }
     }
 
-    fun toJson() : JSONArray{
-        val json = JSONArray(this);
-        // Format: first line empty (,,) and every film is newline
-        println(json);
-        return json;
+    fun genresToString(context: Context): String {
+        return genres.joinToString(", ") { it.getDisplayName(context) }
     }
 
-
-    override fun toString(): String {
-        return "$title,$genres,$isWatched"
-    }
-}
-
-fun getGenres(context: Context): Array<String> {
-    return context.resources.getStringArray(R.array.genre_names)
-}
-
-@Deprecated("Will be replaced to JSON!")
-fun csvToFilms(csvData: List<List<String>>) : MutableList<Film> {
-    val filmList: MutableList<Film> = mutableListOf()
-
-    if (csvData.count() < 2) return filmList
-
-    for (i in csvData) {
-        if (i[0].isEmpty()) {
-            continue
+    fun toJson(apiAction: APIAction, sheetURL: String): JSONObject {
+        val filmJson = JSONObject().apply {
+            put("apiAction", apiAction.name)
+            put("sheetURL", sheetURL)
+            put("filmTitle", title)
+            put("filmGenresIDs", JSONArray(genres.map { it.id }))
         }
 
-        filmList.add(Film(i[0], intArrayOf(i[1].toInt()), i[2].toInt()))
-    }
+        when (apiAction) {
+            APIAction.ADD -> {
+                // For adding, we don't need an ID or isWatched status
+            }
+            APIAction.EDIT, APIAction.DELETE -> {
+                filmJson.put("filmID", id)
+                filmJson.put("filmIsWatched", isWatched)
+            }
+        }
 
-    return filmList
+        return filmJson
+    }
 }
 
+object FilmUtils {
 
-fun jsonToFilms(jsonData: JSONArray) : MutableList<Film> {
-    val filmList: MutableList<Film> = mutableListOf()
+    fun jsonToFilms(jsonData: JSONArray): List<Film> {
+        val filmList = mutableListOf<Film>()
 
-    if (jsonData.length() < 1) return filmList
+        for (i in 0 until jsonData.length()) {
+            val jsonObject = jsonData.getJSONObject(i)
 
-    for (i in 0 until jsonData.length()) {
-        val jsonObject = jsonData.getJSONObject(i)
+            val title = jsonObject.getString("filmTitle")
+            val genresJson = jsonObject.getJSONArray("filmGenresIDs")
+            val isWatched = jsonObject.getInt("filmIsWatched")
+            val genresList = (0 until genresJson.length()).map {
+                Film.Genre.fromId(genresJson.getInt(it))
+            }
+            val id = jsonObject.getInt("filmID")
 
-        // Process the JSON
-        val title = jsonObject.getString("filmTitle")
+            filmList.add(Film(title, genresList, isWatched == 1, id))
+        }
 
-        val genresJson = jsonObject.getJSONArray("filmGenresIDs") // Genres
-        val isWatched = jsonObject.getInt("filmIsWatched")
-
-        val genresList: List<Int> = (0 until genresJson.length()).map { genresJson.getInt(it) }
-
-        val id = jsonObject.getInt("filmID")
-
-        val film = Film(title, genresList.toIntArray(), isWatched, id)
-        filmList.add(film)
+        return filmList
     }
 
-    return filmList
+    fun intArrayToGenresList(intArray: IntArray): List<Film.Genre> {
+        val genresList = (0 until intArray.count()).map {
+            Film.Genre.fromId(it)
+        }
+
+        return genresList
+    }
+
+
 }
-
-fun filmToJson(film: Film, apiAction : String = "ADD", sheetURL: String) : JSONObject {
-    val filmJson = JSONObject().apply {
-        put("apiAction", apiAction)
-        put("sheetURL", sheetURL)
-        put("filmTitle", film.title)
-        put("filmGenresIDs", JSONArray(film.genres))
-    }
-
-    if (apiAction != "ADD") {
-        filmJson.put("filmID", film.id)
-        filmJson.put("filmIsWatched", film.isWatched)
-    }
-
-    return filmJson
-}
-
-
