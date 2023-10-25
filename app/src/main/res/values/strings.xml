@@ -46,4 +46,9 @@
     <string name="app_name">FilmRandomizer</string>
     <string name="button_randomize" translatable="false">Randomize</string>
     <string name="random_result_title">Result</string>
+    <string name="button_edit">Edit</string>
+    <string name="button_watched_film">Watched</string>
+    <string name="edit_header">Edit Film</string>
+    <string name="button_save">Save</string>
+    <string name="loading">Loading...</string>
 </resources>

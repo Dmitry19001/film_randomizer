@@ -1,13 +1,9 @@
 package fi.indigon.kd_filmrandomizer
 
-import FilmListAdapter
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.View
-import android.view.WindowManager
 import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +20,9 @@ val FilmList = mutableListOf<Film>()
 
 class MainActivity : AppCompatActivity(){
 
+    private lateinit var loadingDialog: LoadingDialog
     private var sheetURL = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -34,9 +32,11 @@ class MainActivity : AppCompatActivity(){
         setContentView(R.layout.activity_main)
 
         val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
-        val loadingOverlay = findViewById<FrameLayout>(R.id.loadingOverlay)
 
-        toggleLoadingOverlay(loadingOverlay, true)
+        loadingDialog = LoadingDialog(this)
+
+        loadingDialog.show()
+
 
         // On addNewFilm activity close
         addNewFilmActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
@@ -45,9 +45,9 @@ class MainActivity : AppCompatActivity(){
         }
 
         filmAdapter.setOnFilmDeleteListener { film ->
-            val restClient = RestClient(this, sheetURL);
+            val restClient = RestClient(this, sheetURL)
 
-            toggleLoadingOverlay(loadingOverlay, true)
+            loadingDialog.show()
 
             lifecycleScope.launch(Dispatchers.Main) {
                 val (isDone, responseCode) = restClient.postFilmData(film, APIAction.DELETE)
@@ -64,13 +64,13 @@ class MainActivity : AppCompatActivity(){
         val listView = findViewById<ListView>(R.id.filmList)
 
         if (sheetURL.isNotEmpty()) {
-            val restClient = RestClient(this, sheetURL);
+            val restClient = RestClient(this, sheetURL)
             lifecycleScope.launch(Dispatchers.Main) {
-                requestFilms(restClient, filmAdapter, loadingOverlay)
+                requestFilms(restClient, filmAdapter)
             }
         }
         else {
-            toggleLoadingOverlay(loadingOverlay, false)
+            loadingDialog.dismiss()
             Snackbar.make(findViewById(R.id.MainLayout), getString(R.string.error_undefined_sheetUrl), Snackbar.LENGTH_SHORT)
                 .show()
         }
@@ -87,28 +87,12 @@ class MainActivity : AppCompatActivity(){
         finish()
     }
 
-    private fun toggleLoadingOverlay(loadingOverlay: View, state: Boolean) {
-        if (state){
-            loadingOverlay.visibility = View.VISIBLE
 
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        }
-        else {
-            loadingOverlay.visibility = View.GONE
-
-            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-        }
-
-    }
-
-
-    private suspend fun requestFilms(restClient: RestClient, filmAdapter: FilmListAdapter, loadingOverlay : View) {
+    private suspend fun requestFilms(restClient: RestClient, filmAdapter: FilmListAdapter) {
         restClient.getFilmsData { json ->
             // Process the JSON data here
             if (json == null){
-                toggleLoadingOverlay(loadingOverlay, false)
+                loadingDialog.dismiss()
                 return@getFilmsData
             }
 
@@ -116,7 +100,7 @@ class MainActivity : AppCompatActivity(){
             FilmList.addAll(FilmUtils.jsonToFilms(json))
 
             filmAdapter.notifyDataSetChanged()
-            toggleLoadingOverlay(loadingOverlay, false)
+            loadingDialog.dismiss()
         }
     }
 

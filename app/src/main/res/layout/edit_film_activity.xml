@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/filmAddNewWindow"
+    android:id="@+id/filmEditWindow"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -23,7 +23,7 @@
             android:id="@+id/textView2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/add_new_header"
+            android:text="@string/edit_header"
             android:textAlignment="center"
             android:textSize="28sp" />
 
@@ -48,7 +48,7 @@
                     android:textSize="22sp" />
 
                 <EditText
-                    android:id="@+id/newFilmTitle"
+                    android:id="@+id/filmTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginVertical="10dp"
@@ -86,6 +86,30 @@
 
             </TableRow>
 
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/watchedTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:gravity="end"
+                    android:text="@string/is_watched_header"
+                    android:textSize="22sp" />
+
+                <CheckBox
+                    android:id="@+id/isWatchedCheckBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="16dp"
+                    android:padding="12dp"
+                    android:text="@string/is_watched_header" />
+
+            </TableRow>
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -93,17 +117,17 @@
                 android:gravity="start">
 
                 <Button
-                    android:id="@+id/button_submit_new"
+                    android:id="@+id/button_submit"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="10dp"
                     android:paddingHorizontal="30dp"
                     android:paddingVertical="16dp"
-                    android:text="@string/button_add_new"
+                    android:text="@string/button_save"
                     android:textSize="18sp" />
 
                 <Button
-                    android:id="@+id/button_cancel_new"
+                    android:id="@+id/button_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="30dp"
@@ -115,5 +139,4 @@
         </TableLayout>
 
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

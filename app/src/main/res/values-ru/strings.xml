@@ -43,4 +43,9 @@
     <string name="setting_app_version_title">Версия приложения</string>
     <string name="app_name">Рандомайзер Кино</string>
     <string name="random_result_title">Результат</string>
+    <string name="button_edit">Редактировать</string>
+    <string name="button_watched_film">Посмотрено</string>
+    <string name="edit_header">Редактирование фильма</string>
+    <string name="button_save">Сохранить</string>
+    <string name="loading">Загрузка...</string>
 </resources>

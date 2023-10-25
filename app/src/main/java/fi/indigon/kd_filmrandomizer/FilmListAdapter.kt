@@ -1,5 +1,7 @@
-
+package fi.indigon.kd_filmrandomizer
 import android.content.Context
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +10,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import fi.indigon.kd_filmrandomizer.Film
-import fi.indigon.kd_filmrandomizer.R
 import kotlinx.coroutines.DelicateCoroutinesApi
 
 class FilmListAdapter(
@@ -69,31 +69,27 @@ class FilmListAdapter(
         }
 
         viewHolder.titleTextView.text = film.title
-        val genreText = "${context.getString(R.string.genres)}: ${film.genresToString(context)}"
-        viewHolder.genreTextView.text = genreText
+        viewHolder.genreTextView.text = "${context.getString(R.string.genres)}: ${film.genresToString(context)}"
+
         val watchedText = "${context.getString(R.string.is_watched_header)}: ${
             if (film.isWatched) context.getString(R.string.yes) else context.getString(R.string.no)
         }"
         viewHolder.watchedTextView.text = watchedText
 
-        val filmDeletePanel = viewHolder.filmDeletePanel
-        val buttonDeleteFilm = viewHolder.buttonDeleteFilm
-        val buttonCancelDelete = viewHolder.buttonCancelDelete
 
         // Handling Cancel Button
-        buttonCancelDelete.setOnClickListener {
-            switchDeletePanel(filmDeletePanel) // Hiding deletion panel
+        viewHolder.buttonCancelDelete.setOnClickListener {
+            viewHolder.filmDeletePanel.isVisible = !viewHolder.filmDeletePanel.isVisible // Hiding deletion panel
         }
 
         // Handling Delete Button
-        buttonDeleteFilm.setOnClickListener {
-            println("TRYING TO DELETE $film")
-
+        viewHolder.buttonDeleteFilm.setOnClickListener {
             onFilmDeleteListener?.onFilmDeleted(film)
         }
 
         listItemView.setOnLongClickListener {
-            switchDeletePanel(filmDeletePanel)
+            vibrateForFeedback(context)
+            viewHolder.filmDeletePanel.isVisible = !viewHolder.filmDeletePanel.isVisible
             true // Return true to indicate the long press is handled
         }
 
@@ -104,11 +100,20 @@ class FilmListAdapter(
         onFilmDeleteListener = listener
     }
 
-    private fun switchDeletePanel(filmDeletePanel: LinearLayout) {
-        if (filmDeletePanel.isVisible) {
-            filmDeletePanel.visibility = View.GONE
-        } else {
-            filmDeletePanel.visibility = View.VISIBLE
+    private fun vibrateForFeedback(context: Context) {
+        val vibrator = context.getSystemService(Vibrator::class.java) as Vibrator
+
+        // Check if the device has a vibrator
+        if (vibrator.hasVibrator()) {
+            // Vibrate for a short period, e.g., 50 milliseconds
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                // For API 26 and above
+                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                // For API 25 and below
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(50)
+            }
         }
     }
 }

@@ -3,7 +3,6 @@ package fi.indigon.kd_filmrandomizer
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
@@ -14,12 +13,15 @@ import kotlinx.coroutines.launch
 
 class AddNewFilmActivity : ComponentActivity() {
 
+    private lateinit var loadingDialog: LoadingDialog
     private var sheetURL = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         sheetURL = PreferenceUtils.getGoogleSheetUrl(this)
+
+        loadingDialog = LoadingDialog(this)
 
         setContentView(R.layout.add_new_film_activity)
 
@@ -39,12 +41,10 @@ class AddNewFilmActivity : ComponentActivity() {
             val screenHeight = rootView.height
             val keypadHeight = screenHeight - rect.bottom
 
-            // You can define a threshold to determine when the keyboard is visible
+            // Threshold to determine when the keyboard is visible
             val threshold = screenHeight / 3
 
             if (keypadHeight > threshold) {
-                // Keyboard is visible; adjust your UI here
-
                 // Calculate the new height for the root view
                 val newHeight = screenHeight - keypadHeight
 
@@ -54,7 +54,6 @@ class AddNewFilmActivity : ComponentActivity() {
                 // Apply the new LayoutParams to the root view
                 rootView.layoutParams = initialRootLayoutParams
             } else {
-                // Keyboard is hidden; reset your UI here
 
                 // Restore the initial LayoutParams when the keyboard is hidden
                 rootView.layoutParams = initialRootLayoutParams
@@ -67,7 +66,6 @@ class AddNewFilmActivity : ComponentActivity() {
         val titleInput = findViewById<EditText>(R.id.newFilmTitle)
         val buttonSubmitNewFilm = findViewById<Button>(R.id.button_submit_new)
         val restClient = RestClient(this, sheetURL)
-        val loadingOverlay = findViewById<View>(R.id.loadingOverlay)
 
         val multipleChoice = findViewById<TextView>(R.id.genresMultiselect)
 
@@ -84,7 +82,7 @@ class AddNewFilmActivity : ComponentActivity() {
             val genres = FilmUtils.intArrayToGenresList(genresIDs)
 
             if (title.isNotEmpty() && genres.isNotEmpty()) {
-                toggleLoadingOverlay(loadingOverlay, true)
+                loadingDialog.show()
 
                 val film = Film(title, genres)
 
@@ -102,7 +100,7 @@ class AddNewFilmActivity : ComponentActivity() {
                         // UNABLE TO UPLOAD
                         Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.upload_error), Snackbar.LENGTH_SHORT).show()
                     }
-                    toggleLoadingOverlay(loadingOverlay, false)
+                    loadingDialog.dismiss()
                 }
             } else {
                 if (title.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
@@ -116,19 +114,6 @@ class AddNewFilmActivity : ComponentActivity() {
             // Closing activity
             setResult(RESULT_CANCELED)
             finish()
-        }
-    }
-
-    private fun toggleLoadingOverlay(loadingOverlay: View, state: Boolean) {
-        if (state) {
-            loadingOverlay.visibility = View.VISIBLE
-            window.setFlags(
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            )
-        } else {
-            loadingOverlay.visibility = View.GONE
-            window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         }
     }
 }
