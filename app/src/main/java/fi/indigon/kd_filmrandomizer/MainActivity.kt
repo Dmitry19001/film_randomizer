@@ -18,6 +18,7 @@ import java.util.Locale
 val FilmList = mutableListOf<Film>()
 
 
+//class MainActivity : ComponentActivity(){
 class MainActivity : AppCompatActivity(){
 
     private lateinit var loadingDialog: LoadingDialog
