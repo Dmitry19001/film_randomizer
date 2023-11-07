@@ -48,4 +48,6 @@
     <string name="edit_header">Редактирование фильма</string>
     <string name="button_save">Сохранить</string>
     <string name="loading">Загрузка...</string>
+    <string name="question_mark_watched">Хотите отметить просмотренным?</string>
+    <string name="title_activity_editor">Редактор</string>
 </resources>

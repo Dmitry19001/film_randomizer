@@ -17,26 +17,36 @@ class FilmListAdapter(
     private val filmList: MutableList<Film>,
 ) : BaseAdapter() {
     private var onFilmDeleteListener: OnFilmDeleteListener? = null
+    private var onFilmEditListener: OnFilmEditListener? = null
 
     fun interface OnFilmDeleteListener {
         fun onFilmDeleted(film: Film)
     }
 
+    fun interface OnFilmEditListener {
+        fun onFilmEdit(film: Film, watchedOnly: Boolean)
+    }
+
+
     private class ViewHolder(view: View) {
         val titleTextView: TextView
         val genreTextView: TextView
         val watchedTextView: TextView
-        val filmDeletePanel: LinearLayout
+        val filmEditPanel: LinearLayout
         val buttonDeleteFilm: Button
-        val buttonCancelDelete: Button
+        val buttonCancelEdit: Button
+        val buttonEditFilm: Button
+        val buttonWatchedFilm: Button
 
         init {
             titleTextView = view.findViewById(R.id.titleTextView)
             genreTextView = view.findViewById(R.id.genreTextView)
             watchedTextView = view.findViewById(R.id.watchedTextView)
-            filmDeletePanel = view.findViewById(R.id.filmDeletePanel)
+            filmEditPanel = view.findViewById(R.id.filmEditPanel)
             buttonDeleteFilm = view.findViewById(R.id.buttonDeleteFilm)
-            buttonCancelDelete = view.findViewById(R.id.buttonCancelFilmDelete)
+            buttonCancelEdit = view.findViewById(R.id.buttonCancelFilmEdit)
+            buttonEditFilm = view.findViewById(R.id.buttonEditFilm)
+            buttonWatchedFilm = view.findViewById(R.id.buttonWatchedFilm)
         }
     }
 
@@ -78,8 +88,8 @@ class FilmListAdapter(
 
 
         // Handling Cancel Button
-        viewHolder.buttonCancelDelete.setOnClickListener {
-            viewHolder.filmDeletePanel.isVisible = !viewHolder.filmDeletePanel.isVisible // Hiding deletion panel
+        viewHolder.buttonCancelEdit.setOnClickListener {
+            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible // Hiding deletion panel
         }
 
         // Handling Delete Button
@@ -87,9 +97,21 @@ class FilmListAdapter(
             onFilmDeleteListener?.onFilmDeleted(film)
         }
 
+        // Handling Edit Button
+        viewHolder.buttonEditFilm.setOnClickListener {
+            onFilmEditListener?.onFilmEdit(film, false) // Editing whole film
+        }
+
+        // Handling Watched Button
+        viewHolder.buttonWatchedFilm.isVisible = !film.isWatched
+
+        viewHolder.buttonWatchedFilm.setOnClickListener {
+            onFilmEditListener?.onFilmEdit(film, true) // Only need to send that film is watched
+        }
+
         listItemView.setOnLongClickListener {
             vibrateForFeedback(context)
-            viewHolder.filmDeletePanel.isVisible = !viewHolder.filmDeletePanel.isVisible
+            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible
             true // Return true to indicate the long press is handled
         }
 
@@ -98,6 +120,10 @@ class FilmListAdapter(
 
     fun setOnFilmDeleteListener(listener: OnFilmDeleteListener?) {
         onFilmDeleteListener = listener
+    }
+
+    fun setOnFilmEditListener(listener: OnFilmEditListener?) {
+        onFilmEditListener = listener
     }
 
     private fun vibrateForFeedback(context: Context) {

@@ -31,19 +31,41 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
+// TODO FULL MIGRATE TO COMPOSE NEEDS PARTIAL REWRITE OF CODE
+//        setContent {
+//            MainLayout()
+//        }
+
         val filmAdapter = FilmListAdapter(this, FilmList) // Replace with your data source
 
         loadingDialog = LoadingDialog(this)
 
-        loadingDialog.show()
-
-
         // On addNewFilm activity close
         addNewFilmActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
-            // Reloading main activity to get new film list
-            reloadMainActivity()
+            // Requesting new data
+            requestFilms(filmAdapter)
         }
 
+        setupFilmAdapterCallbacks(filmAdapter)
+
+        // Initializing ListView and its Adapter
+        val listView = findViewById<ListView>(R.id.filmList)
+
+        if (sheetURL.isNotEmpty()) {
+            requestFilms(filmAdapter)
+        }
+        else {
+            loadingDialog.dismiss()
+            Snackbar.make(findViewById(R.id.MainLayout), getString(R.string.error_undefined_sheetUrl), Snackbar.LENGTH_SHORT)
+                .show()
+        }
+        // Initializing buttons
+        initButtons()
+
+        listView.adapter = filmAdapter
+    }
+
+    private fun setupFilmAdapterCallbacks(filmAdapter: FilmListAdapter) {
         filmAdapter.setOnFilmDeleteListener { film ->
             val restClient = RestClient(this, sheetURL)
 
@@ -60,24 +82,31 @@ class MainActivity : AppCompatActivity(){
             }
         }
 
-        // Initializing ListView and its Adapter
-        val listView = findViewById<ListView>(R.id.filmList)
+        filmAdapter.setOnFilmEditListener { film, watchedOnly ->
+            if (watchedOnly){
+                // Loading dialog
+                loadingDialog.show()
 
-        if (sheetURL.isNotEmpty()) {
-            val restClient = RestClient(this, sheetURL)
-            lifecycleScope.launch(Dispatchers.Main) {
-                requestFilms(restClient, filmAdapter)
+                // Marking film watched
+                film.markWatched()
+
+                // Sending data
+                val restClient = RestClient(this, sheetURL)
+                lifecycleScope.launch(Dispatchers.Main) {
+                    val (isDone, responseCode) = restClient.postFilmData(film, APIAction.EDIT)
+
+                    // TODO handle response
+                    loadingDialog.dismiss()
+                }
+
+                requestFilms(filmAdapter)
+
+                return@setOnFilmEditListener
             }
-        }
-        else {
-            loadingDialog.dismiss()
-            Snackbar.make(findViewById(R.id.MainLayout), getString(R.string.error_undefined_sheetUrl), Snackbar.LENGTH_SHORT)
-                .show()
-        }
-        // Initializing buttons
-        initButtons()
 
-        listView.adapter = filmAdapter
+            val intent = Intent(this, EditFilmActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun reloadMainActivity() {
@@ -88,19 +117,25 @@ class MainActivity : AppCompatActivity(){
     }
 
 
-    private suspend fun requestFilms(restClient: RestClient, filmAdapter: FilmListAdapter) {
-        restClient.getFilmsData { json ->
-            // Process the JSON data here
-            if (json == null){
+    private fun requestFilms(filmAdapter: FilmListAdapter) {
+        loadingDialog.show()
+
+        val restClient = RestClient(this, sheetURL)
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            restClient.getFilmsData { json ->
+                // Process the JSON data here
+                if (json == null){
+                    loadingDialog.dismiss()
+                    return@getFilmsData
+                }
+
+                FilmList.clear()
+                FilmList.addAll(FilmUtils.jsonToFilms(json))
+
+                filmAdapter.notifyDataSetChanged()
                 loadingDialog.dismiss()
-                return@getFilmsData
             }
-
-            FilmList.clear()
-            FilmList.addAll(FilmUtils.jsonToFilms(json))
-
-            filmAdapter.notifyDataSetChanged()
-            loadingDialog.dismiss()
         }
     }
 
@@ -136,6 +171,7 @@ class MainActivity : AppCompatActivity(){
             reloadMainActivity()
         }
 
+        // RANDOMIZER BUTTON
         val buttonRandom = findViewById<Button>(R.id.buttonRandom)
         buttonRandom.setOnClickListener {
             val intent = Intent(this, RandomizerActivity::class.java)

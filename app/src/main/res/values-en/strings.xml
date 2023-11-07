@@ -48,4 +48,6 @@
     <string name="edit_header">Edit Film</string>
     <string name="button_save">Save</string>
     <string name="loading">Loading...</string>
+    <string name="question_mark_watched">Do you want to mark it watched?</string>
+    <string name="title_activity_editor">Editor</string>
 </resources>

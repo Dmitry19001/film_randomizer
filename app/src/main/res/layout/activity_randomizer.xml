@@ -8,9 +8,11 @@
 
     <Button
         android:id="@+id/buttonRandomize"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_randomize"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,9 +23,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:background="@android:drawable/editbox_background"
         android:hint="@string/genres_choose"
         android:padding="12dp"
+        android:textSize="20sp"
         app:drawableRightCompat="@android:drawable/arrow_down_float"
         app:layout_constraintBottom_toTopOf="@+id/buttonRandomize"
         app:layout_constraintEnd_toEndOf="parent"

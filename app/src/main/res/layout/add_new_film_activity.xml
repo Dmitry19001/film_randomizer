@@ -9,7 +9,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F2FFFFFF"
         android:gravity="center_vertical"
         android:orientation="vertical"
         android:paddingHorizontal="20dp"
@@ -78,7 +77,6 @@
                     android:id="@+id/genresMultiselect"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@android:drawable/editbox_background"
                     android:drawablePadding="16dp"
                     android:hint="@string/genres_choose"
                     android:padding="12dp"

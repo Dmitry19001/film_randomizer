@@ -33,7 +33,7 @@
     <string name="genres_choose">Choose genres</string>
     <string name="film_already_exists">Film already exists!</string>
     <string name="upload_error">ERROR: Unable to upload</string>
-    <string name="app_version" translatable="false">0.2_Alpha</string>
+    <string name="app_version" translatable="false">0.2.4_Alpha</string>
     <string name="settings_info_title">App information</string>
     <string name="setting_app_version_title">App version</string>
     <string name="title_activity_randomizer" translatable="false">RandomizerActivity</string>
@@ -51,4 +51,6 @@
     <string name="edit_header">Edit Film</string>
     <string name="button_save">Save</string>
     <string name="loading">Loading...</string>
+    <string name="question_mark_watched">Do you want to mark it watched?</string>
+    <string name="title_activity_editor">Editor</string>
 </resources>

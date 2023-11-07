@@ -8,7 +8,7 @@ import org.json.JSONObject
 data class Film(
     val title: String = "Unknown",
     val genres: List<Genre> = emptyList(),
-    val isWatched: Boolean = false,
+    var isWatched: Boolean = false,
     val id: Int = -1
 ) {
     enum class Genre(val id: Int, val stringResId: Int) {
@@ -54,12 +54,17 @@ data class Film(
             }
             APIAction.EDIT, APIAction.DELETE -> {
                 filmJson.put("filmID", id)
-                filmJson.put("filmIsWatched", isWatched)
+                filmJson.put("filmIsWatched", if (isWatched) 1 else 0)
             }
         }
 
         return filmJson
     }
+
+    fun markWatched() {
+        isWatched = true
+    }
+
 }
 
 object FilmUtils {
@@ -85,8 +90,11 @@ object FilmUtils {
     }
 
     fun intArrayToGenresList(intArray: IntArray): List<Film.Genre> {
-        val genresList = (0 until intArray.count()).map {
-            Film.Genre.fromId(it)
+        val genresList = mutableListOf<Film.Genre>()
+
+        for (index in intArray) {
+            val genre = Film.Genre.fromId(index)
+            genresList.add(genre)
         }
 
         return genresList

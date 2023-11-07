@@ -23,7 +23,7 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
-            val languagePreference = findPreference<ListPreference>("app_language")
+            val languagePreference = findPreference<ListPreference>("setting_app_language")
 
             languagePreference?.let {
                 it.summary = it.value
