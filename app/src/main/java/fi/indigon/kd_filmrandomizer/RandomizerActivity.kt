@@ -6,7 +6,10 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class RandomizerActivity : ComponentActivity() {
@@ -54,15 +57,75 @@ class RandomizerActivity : ComponentActivity() {
 
             val randomIndex = Random.nextInt(0, filmList.count())
 
-            showOkDialog(this, getString(R.string.random_result_title), filmList[randomIndex].title)
+            showAskDialog(
+                this,
+                "${getString(R.string.random_result_title)}\n${getString(R.string.question_mark_watched)}",
+                filmList[randomIndex].title,
+                positiveAction = {
+                    sendChanges(filmList, randomIndex)
+                }
+            )
+
         }
     }
 
-    private fun showOkDialog(context: Context, title: String, message: String) {
+    private fun sendChanges(
+        filmList: List<Film>,
+        randomIndex: Int
+    ) {
+        // Show loading dialog
+        val loadingDialog = LoadingDialog(this)
+        loadingDialog.show()
+
+        // Setting up client
+        val restClient = RestClient(this, PreferenceUtils.getGoogleSheetUrl(this))
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            // Marking film as watched
+            filmList[randomIndex].markWatched()
+
+            // Sending changes and getting response
+            val (isDone, responseCode) = restClient.postFilmData(
+                filmList[randomIndex],
+                APIAction.EDIT
+            )
+
+            // GOOD
+            if (isDone) {
+                Snackbar.make(
+                    findViewById(R.id.MainLayout),
+                    getString(R.string.upload_success),
+                    Snackbar.LENGTH_SHORT
+                )
+                    .show()
+            } else { // OH shit, not good
+                Snackbar.make(
+                    findViewById(R.id.MainLayout),
+                    "${getString(R.string.error_upload_changes)} $responseCode",
+                    Snackbar.LENGTH_SHORT
+                )
+                    .show()
+            }
+        }
+        loadingDialog.dismiss()
+    }
+
+    private fun showAskDialog(
+        context: Context,
+        title: String,
+        message: String,
+        positiveAction: () -> Unit
+    ) {
         AlertDialog.Builder(context)
             .setTitle(title)
             .setMessage(message)
-            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .setPositiveButton(context.getString(R.string.yes)) { dialog, _ ->
+                positiveAction.invoke()
+                dialog.dismiss()
+            }
+            .setNegativeButton(context.getString(R.string.no)) { dialog, _ ->
+                dialog.cancel()
+            }
             .show()
     }
 }
