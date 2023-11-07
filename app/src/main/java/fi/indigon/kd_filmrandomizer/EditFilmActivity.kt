@@ -1,18 +1,19 @@
 package fi.indigon.kd_filmrandomizer
 
-import android.graphics.Rect
+import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
-import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
-class EditFilmActivity : ComponentActivity() {
+class EditFilmActivity : LocalizedActivity() {
     private lateinit var loadingDialog: LoadingDialog
     private var sheetURL = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -20,68 +21,112 @@ class EditFilmActivity : ComponentActivity() {
 
         loadingDialog = LoadingDialog(this)
 
-        setContentView(R.layout.edit_film_activity)
+        setContentView(R.layout.activity_edit_film)
 
-        // making current view adjustable to keyboard
-        makeAdjustableView()
+        val film = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getParcelableExtra("EXTRA_FILM", Film::class.java)
+        } else {
+            intent.getParcelableExtra<Film>("EXTRA_FILM")
+        }
 
-        initUI()
-
-        Snackbar.make(
-            findViewById(R.id.filmEditWindow),
-            "Nothing works here!",
-            Snackbar.LENGTH_SHORT
-        ).show()
+        if (film != null) {
+            initUI(film)
+        }
+        else {
+            Snackbar.make(
+                findViewById(R.id.filmEditWindow),
+                "Nothing works here!",
+                Snackbar.LENGTH_SHORT
+            ).show()
+        }
     }
 
-    private fun initUI() {
+    private fun initUI(film: Film) {
+        // RESTClient
+        val restClient = RestClient(this, sheetURL)
+
         // Other
         val filmTitle = findViewById<EditText>(R.id.filmTitle)
+        filmTitle.setText(film.title)
+
         val genresMultiselect = findViewById<TextView>(R.id.genresMultiselect)
+        val multipleGenreChoiceWidget = MultipleGenreChoiceWidget(this, genresMultiselect, film.genres)
+
 
         // Checkbox
         val isWatchedCheckBox = findViewById<CheckBox>(R.id.isWatchedCheckBox)
+        isWatchedCheckBox.isChecked = film.isWatched
 
         // Buttons
         val buttonSubmit = findViewById<Button>(R.id.button_submit)
         val buttonCancel = findViewById<Button>(R.id.button_cancel)
 
         buttonSubmit.setOnClickListener {
-            finish()
+            sendData(film.id, filmTitle, multipleGenreChoiceWidget, isWatchedCheckBox, restClient)
         }
 
         buttonCancel.setOnClickListener {
+            setResult(RESULT_CANCELED)
             finish()
         }
     }
 
-    private fun makeAdjustableView() {
-        val rootView = findViewById<View>(R.id.filmEditWindow)
-        val initialRootLayoutParams = rootView.layoutParams // Store the initial layout params
+    private fun sendData(
+        filmId: Int,
+        filmTitle: EditText,
+        multipleGenreChoiceWidget: MultipleGenreChoiceWidget,
+        isWatchedCheckBox: CheckBox,
+        restClient: RestClient
+    ) {
+        val title = filmTitle.text.toString()
 
-        rootView.viewTreeObserver.addOnGlobalLayoutListener {
-            val rect = Rect()
-            rootView.getWindowVisibleDisplayFrame(rect)
-            val screenHeight = rootView.height
-            val keypadHeight = screenHeight - rect.bottom
+        val genresIDs = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed { index, value ->
+            if (value) index
+            else null
+        }.filterNotNull().toIntArray()
 
-            // Threshold to determine when the keyboard is visible
-            val threshold = screenHeight / 3
+        val genres = FilmUtils.intArrayToGenresList(genresIDs)
 
-            if (keypadHeight > threshold) {
-                // Calculate the new height for the root view
-                val newHeight = screenHeight - keypadHeight
+        if (title.isNotEmpty() && genres.isNotEmpty()) {
+            loadingDialog.show()
 
-                // Create new LayoutParams with the adjusted height
-                initialRootLayoutParams.height = newHeight
+            val film = Film(title, genres, isWatchedCheckBox.isChecked, filmId)
 
-                // Apply the new LayoutParams to the root view
-                rootView.layoutParams = initialRootLayoutParams
-            } else {
+            lifecycleScope.launch {
+                val (isDone, responseCode) = restClient.postFilmData(
+                    film = film,
+                    apiAction = APIAction.EDIT
+                )
 
-                // Restore the initial LayoutParams when the keyboard is hidden
-                rootView.layoutParams = initialRootLayoutParams
+                if (isDone) {
+                    Snackbar.make(
+                        findViewById(R.id.filmAddNewWindow),
+                        getString(R.string.upload_success),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    setResult(RESULT_OK)
+                    finish()
+                } else {
+                    // UNABLE TO UPLOAD
+                    Snackbar.make(
+                        findViewById(R.id.filmAddNewWindow),
+                        getString(R.string.upload_error),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+                loadingDialog.dismiss()
             }
+        } else {
+            if (title.isEmpty()) Snackbar.make(
+                findViewById(R.id.filmAddNewWindow),
+                getString(R.string.empty_title_error),
+                Snackbar.LENGTH_SHORT
+            ).show()
+            if (genres.isEmpty()) Snackbar.make(
+                findViewById(R.id.filmAddNewWindow),
+                getString(R.string.error_empty_genre),
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
     }
 }

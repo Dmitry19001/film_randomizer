@@ -23,10 +23,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
+        android:background="#349575CD"
+        android:drawableRight="@android:drawable/arrow_down_float"
         android:hint="@string/genres_choose"
         android:padding="12dp"
         android:textSize="20sp"
-        app:drawableRightCompat="@android:drawable/arrow_down_float"
         app:layout_constraintBottom_toTopOf="@+id/buttonRandomize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

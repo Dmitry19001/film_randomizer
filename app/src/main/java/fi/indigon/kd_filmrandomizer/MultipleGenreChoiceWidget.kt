@@ -6,7 +6,8 @@ import androidx.appcompat.app.AlertDialog
 
 class MultipleGenreChoiceWidget(
     private val context: Context,
-    private val textView: TextView
+    private val textView: TextView,
+    private val preselectedGenres: List<Film.Genre>? = null
 ) {
 
     private var selectedGenres: BooleanArray = booleanArrayOf()
@@ -19,6 +20,18 @@ class MultipleGenreChoiceWidget(
         return selectedGenres
     }
 
+    private fun preselectGenres(selectedGenresList: ArrayList<Int>, genres: Array<Film.Genre>) {
+        for (genre in preselectedGenres!!) {
+            selectedGenresList.add(genre.id)
+            selectedGenres[genre.id] = true
+        }
+
+        val genreText = selectedGenresList.joinToString(", ") {
+            genres[it].getDisplayName(context)
+        }
+        textView.text = genreText
+    }
+
     private fun initMultipleGenreChoiceWidget() {
         val selectedGenresList = arrayListOf<Int>()
 
@@ -26,6 +39,10 @@ class MultipleGenreChoiceWidget(
         val genreNames = genres.map { it.getDisplayName(context) }.toTypedArray()
 
         selectedGenres = BooleanArray(genres.size)
+
+        if (preselectedGenres != null) {
+            preselectGenres(selectedGenresList, genres)
+        }
 
         textView.setOnClickListener {
             val builder = AlertDialog.Builder(context)
@@ -35,12 +52,12 @@ class MultipleGenreChoiceWidget(
             builder.setCancelable(false)
             builder.setMultiChoiceItems(
                 genreNames, selectedGenres
-            ) { _, i, b ->
-                if (b) {
-                    selectedGenresList.add(i)
+            ) { _, index, bool ->
+                if (bool) {
+                    selectedGenresList.add(index)
                     selectedGenresList.sort()
                 } else {
-                    selectedGenresList.remove(Integer.valueOf(i))
+                    selectedGenresList.remove(Integer.valueOf(index))
                 }
             }
             builder.setPositiveButton(

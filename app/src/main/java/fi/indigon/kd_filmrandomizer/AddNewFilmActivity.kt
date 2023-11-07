@@ -1,17 +1,14 @@
 package fi.indigon.kd_filmrandomizer
 
-import android.graphics.Rect
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
-import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 
-class AddNewFilmActivity : ComponentActivity() {
+class AddNewFilmActivity : LocalizedActivity() {
 
     private lateinit var loadingDialog: LoadingDialog
     private var sheetURL = ""
@@ -23,47 +20,13 @@ class AddNewFilmActivity : ComponentActivity() {
 
         loadingDialog = LoadingDialog(this)
 
-        setContentView(R.layout.add_new_film_activity)
-
-        // making current view adjustable to keyboard
-        makeAdjustableView()
+        setContentView(R.layout.activity_add_new_film)
 
         initUI()
     }
 
-    private fun makeAdjustableView() {
-        val rootView = findViewById<View>(R.id.filmAddNewWindow)
-        val initialRootLayoutParams = rootView.layoutParams // Store the initial layout params
-
-        rootView.viewTreeObserver.addOnGlobalLayoutListener {
-            val rect = Rect()
-            rootView.getWindowVisibleDisplayFrame(rect)
-            val screenHeight = rootView.height
-            val keypadHeight = screenHeight - rect.bottom
-
-            // Threshold to determine when the keyboard is visible
-            val threshold = screenHeight / 3
-
-            if (keypadHeight > threshold) {
-                // Calculate the new height for the root view
-                val newHeight = screenHeight - keypadHeight
-
-                // Create new LayoutParams with the adjusted height
-                initialRootLayoutParams.height = newHeight
-
-                // Apply the new LayoutParams to the root view
-                rootView.layoutParams = initialRootLayoutParams
-            } else {
-
-                // Restore the initial LayoutParams when the keyboard is hidden
-                rootView.layoutParams = initialRootLayoutParams
-            }
-        }
-    }
-
     private fun initUI() {
-        // SUBMIT NEW FILM BUTTON
-        val titleInput = findViewById<EditText>(R.id.newFilmTitle)
+        val titleInput = findViewById<EditText>(R.id.filmTitle)
         val buttonSubmitNewFilm = findViewById<Button>(R.id.button_submit_new)
         val restClient = RestClient(this, sheetURL)
 
@@ -71,49 +34,81 @@ class AddNewFilmActivity : ComponentActivity() {
 
         val multipleGenreChoiceWidget = MultipleGenreChoiceWidget(this, multipleChoice)
 
+        // SUBMIT NEW FILM BUTTON
         buttonSubmitNewFilm.setOnClickListener {
-            val title = titleInput.text.toString()
-
-            val genresIDs = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed { index, value ->
-                if (value) index
-                else null
-            }.filterNotNull().toIntArray()
-
-            val genres = FilmUtils.intArrayToGenresList(genresIDs)
-
-            if (title.isNotEmpty() && genres.isNotEmpty()) {
-                loadingDialog.show()
-
-                val film = Film(title, genres)
-
-                lifecycleScope.launch {
-                    val (isDone, responseCode) = restClient.postFilmData(film = film, apiAction = APIAction.ADD)
-
-                    if (isDone) {
-                        Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.upload_success), Snackbar.LENGTH_SHORT).show()
-                        setResult(RESULT_OK)
-                        finish()
-                    } else if (responseCode == ResponseCode.ALREADY_EXISTS) {
-                        // ALREADY EXISTS
-                        Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.film_already_exists), Snackbar.LENGTH_SHORT).show()
-                    } else {
-                        // UNABLE TO UPLOAD
-                        Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.upload_error), Snackbar.LENGTH_SHORT).show()
-                    }
-                    loadingDialog.dismiss()
-                }
-            } else {
-                if (title.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.empty_title_error), Snackbar.LENGTH_SHORT).show()
-                if (genres.isEmpty()) Snackbar.make(findViewById(R.id.filmAddNewWindow), getString(R.string.error_empty_genre), Snackbar.LENGTH_SHORT).show()
-            }
+            sendData(titleInput, multipleGenreChoiceWidget, restClient)
         }
 
         // CANCEL NEW FILM BUTTON
-        val buttonCancelNewFilm = findViewById<Button>(R.id.button_cancel_new)
+        val buttonCancelNewFilm = findViewById<Button>(R.id.button_cancel)
         buttonCancelNewFilm.setOnClickListener {
             // Closing activity
             setResult(RESULT_CANCELED)
             finish()
+        }
+    }
+
+    private fun sendData(
+        titleInput: EditText,
+        multipleGenreChoiceWidget: MultipleGenreChoiceWidget,
+        restClient: RestClient
+    ) {
+        val title = titleInput.text.toString()
+
+        val genresIDs = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed { index, value ->
+            if (value) index
+            else null
+        }.filterNotNull().toIntArray()
+
+        val genres = FilmUtils.intArrayToGenresList(genresIDs)
+
+        if (title.isNotEmpty() && genres.isNotEmpty()) {
+            loadingDialog.show()
+
+            val film = Film(title, genres)
+
+            lifecycleScope.launch {
+                val (isDone, responseCode) = restClient.postFilmData(
+                    film = film,
+                    apiAction = APIAction.ADD
+                )
+
+                if (isDone) {
+                    Snackbar.make(
+                        findViewById(R.id.filmAddNewWindow),
+                        getString(R.string.upload_success),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                    setResult(RESULT_OK)
+                    finish()
+                } else if (responseCode == ResponseCode.ALREADY_EXISTS) {
+                    // ALREADY EXISTS
+                    Snackbar.make(
+                        findViewById(R.id.filmAddNewWindow),
+                        getString(R.string.film_already_exists),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                } else {
+                    // UNABLE TO UPLOAD
+                    Snackbar.make(
+                        findViewById(R.id.filmAddNewWindow),
+                        getString(R.string.upload_error),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+                loadingDialog.dismiss()
+            }
+        } else {
+            if (title.isEmpty()) Snackbar.make(
+                findViewById(R.id.filmAddNewWindow),
+                getString(R.string.empty_title_error),
+                Snackbar.LENGTH_SHORT
+            ).show()
+            if (genres.isEmpty()) Snackbar.make(
+                findViewById(R.id.filmAddNewWindow),
+                getString(R.string.error_empty_genre),
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
     }
 }

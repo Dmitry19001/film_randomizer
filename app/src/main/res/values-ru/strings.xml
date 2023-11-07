@@ -42,12 +42,13 @@
     <string name="error_undefined_sheetUrl">Ссылка на таблицу Google не найдена! Пожалуйста укажите ссылку в настройках.</string>
     <string name="setting_app_version_title">Версия приложения</string>
     <string name="app_name">Рандомайзер Кино</string>
+    <string name="button_randomize">Рандомизировать</string>
     <string name="random_result_title">Результат</string>
     <string name="button_edit">Редактировать</string>
     <string name="button_watched_film">Посмотрено</string>
     <string name="edit_header">Редактирование фильма</string>
     <string name="button_save">Сохранить</string>
-    <string name="loading">Загрузка...</string>
+    <string name="loading">Загрузка…</string>
     <string name="question_mark_watched">Хотите отметить просмотренным?</string>
     <string name="title_activity_editor">Редактор</string>
 </resources>
