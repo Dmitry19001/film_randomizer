@@ -1,17 +1,19 @@
 package fi.indigon.kd_filmrandomizer
 
 import android.content.Context
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import org.json.JSONObject
 
-
+@Parcelize
 data class Film(
     val title: String = "Unknown",
     val genres: List<Genre> = emptyList(),
     var isWatched: Boolean = false,
     val id: Int = -1
-) {
-    enum class Genre(val id: Int, val stringResId: Int) {
+): Parcelable {
+    enum class Genre(val id: Int, private val stringResId: Int) {
         COMEDY(0, R.string.genre_comedy),
         DRAMA(1, R.string.genre_drama),
         ACTION(2, R.string.genre_action),

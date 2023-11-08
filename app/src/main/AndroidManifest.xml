@@ -19,13 +19,16 @@
         <activity
             android:name=".RandomizerActivity"
             android:exported="false"
-            android:label="@string/title_activity_randomizer"
-            android:theme="@style/Theme.KD_FilmRandomizer" />
+            android:label="@string/title_activity_randomizer" />
+        <activity
+            android:name=".EditFilmActivity"
+            android:exported="false"
+            android:label="@string/title_activity_editor"
+            android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".AddNewFilmActivity"
             android:exported="false"
             android:label="@string/title_activity_add_new_film"
-            android:theme="@style/Theme.KD_FilmRandomizer"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SettingsActivity"

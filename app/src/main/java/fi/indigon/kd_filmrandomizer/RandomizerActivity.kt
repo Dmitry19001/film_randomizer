@@ -5,14 +5,13 @@ import android.content.Context
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-class RandomizerActivity : ComponentActivity() {
+class RandomizerActivity : LocalizedActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_randomizer)

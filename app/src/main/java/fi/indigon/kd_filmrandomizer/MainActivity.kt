@@ -1,26 +1,21 @@
 package fi.indigon.kd_filmrandomizer
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ListView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 val FilmList = mutableListOf<Film>()
 
-
+class MainActivity : LocalizedActivity(){
 //class MainActivity : ComponentActivity(){
-class MainActivity : AppCompatActivity(){
-
+    private lateinit var filmActivity: ActivityResultLauncher<Intent>
     private lateinit var loadingDialog: LoadingDialog
     private var sheetURL = ""
 
@@ -28,7 +23,6 @@ class MainActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
 
         sheetURL = PreferenceUtils.getGoogleSheetUrl(this)
-        loadLocalization()
 
         setContentView(R.layout.activity_main)
 
@@ -41,8 +35,8 @@ class MainActivity : AppCompatActivity(){
 
         loadingDialog = LoadingDialog(this)
 
-        // On addNewFilm activity close
-        addNewFilmActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+        // On addNewFilm or editFilm activity close
+        filmActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
             // Requesting new data
             requestFilms(filmAdapter)
         }
@@ -61,7 +55,7 @@ class MainActivity : AppCompatActivity(){
                 .show()
         }
         // Initializing buttons
-        initButtons()
+        initButtons(filmAdapter)
 
         listView.adapter = filmAdapter
     }
@@ -76,7 +70,7 @@ class MainActivity : AppCompatActivity(){
                 val (isDone, responseCode) = restClient.postFilmData(film, APIAction.DELETE)
                 if (isDone) {
                     println("SUCCESS TO DELETE $film")
-                    reloadMainActivity()
+                    requestFilms(filmAdapter)
                 } else {
                     println("ERROR TO DELETE $responseCode $film")
                 }
@@ -106,17 +100,10 @@ class MainActivity : AppCompatActivity(){
             }
 
             val intent = Intent(this, EditFilmActivity::class.java)
-            startActivity(intent)
+            intent.putExtra("EXTRA_FILM", film)
+            filmActivity.launch(intent)
         }
     }
-
-    private fun reloadMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-        startActivity(intent)
-        finish()
-    }
-
 
     private fun requestFilms(filmAdapter: FilmListAdapter) {
         loadingDialog.show()
@@ -140,23 +127,12 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    private fun loadLocalization() {
-        // Get the selected language from SharedPreferences
-        val sharedPreferences: SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(this)
-        val selectedLanguage = sharedPreferences.getString("setting_app_language", "ru") ?: "ru"
-        val locale = Locale(selectedLanguage)
-        Locale.setDefault(locale)
-    }
-
-    private lateinit var addNewFilmActivity: ActivityResultLauncher<Intent>
-
-    private fun initButtons() {
+    private fun initButtons(filmAdapter: FilmListAdapter) {
         // ADD NEW FILM BUTTON
         val buttonAddNewFilm = findViewById<Button>(R.id.buttonAddNew)
         buttonAddNewFilm.setOnClickListener {
             val intent = Intent(this, AddNewFilmActivity::class.java)
-            addNewFilmActivity.launch(intent)
+            filmActivity.launch(intent)
         }
 
         // BUTTON SETTINGS
@@ -169,7 +145,7 @@ class MainActivity : AppCompatActivity(){
         // SYNC BUTTON
         val buttonSync = findViewById<Button>(R.id.buttonSync)
         buttonSync.setOnClickListener {
-            reloadMainActivity()
+            requestFilms(filmAdapter)
         }
 
         // RANDOMIZER BUTTON

@@ -49,6 +49,7 @@ class RestClient(private val context: Context, private val sheetURL: String) {
 
     suspend fun getFilmsData(callback: OnDataLoadedListener) {
         try {
+            println("Connecting...")
             val response = client.get(apiURL) {
                 url {
                     protocol = URLProtocol.HTTPS
@@ -58,12 +59,17 @@ class RestClient(private val context: Context, private val sheetURL: String) {
 
             when (response.status.value) {
                 in 200..299 -> {
+                    println("Connection success!")
                     val responseBody = response.readBytes().toString(Charsets.UTF_8)
                     println(responseBody)
                     val jsonArray = if (responseBody.isNotEmpty()) JSONArray(responseBody) else null
                     callback.onDataLoaded(jsonArray)
                 }
                 else -> {
+                    val responseBody = response.readBytes().toString(Charsets.UTF_8)
+                    println(responseBody)
+
+                    println("Failed to load data... ${response.status.value}")
                     callback.onDataLoaded(null)
                 }
             }

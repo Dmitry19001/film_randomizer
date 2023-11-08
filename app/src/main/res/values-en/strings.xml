@@ -42,12 +42,13 @@
     <string name="error_undefined_sheetUrl">Undefined Google Sheet URL. Please define it in settings to continue!</string>
     <string name="setting_app_version_title">App version</string>
     <string name="app_name">FilmRandmizer</string>
+    <string name="button_randomize">Randomize</string>
     <string name="random_result_title">Result</string>
     <string name="button_edit">Edit</string>
     <string name="button_watched_film">Watched</string>
     <string name="edit_header">Edit Film</string>
     <string name="button_save">Save</string>
-    <string name="loading">Loading...</string>
+    <string name="loading">Loading…</string>
     <string name="question_mark_watched">Do you want to mark it watched?</string>
     <string name="title_activity_editor">Editor</string>
 </resources>

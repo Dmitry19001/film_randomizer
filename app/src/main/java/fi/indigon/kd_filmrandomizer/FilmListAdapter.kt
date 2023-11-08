@@ -100,6 +100,7 @@ class FilmListAdapter(
         // Handling Edit Button
         viewHolder.buttonEditFilm.setOnClickListener {
             onFilmEditListener?.onFilmEdit(film, false) // Editing whole film
+            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible // Hiding panel
         }
 
         // Handling Watched Button
@@ -107,6 +108,7 @@ class FilmListAdapter(
 
         viewHolder.buttonWatchedFilm.setOnClickListener {
             onFilmEditListener?.onFilmEdit(film, true) // Only need to send that film is watched
+            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible // Hiding panel
         }
 
         listItemView.setOnLongClickListener {
