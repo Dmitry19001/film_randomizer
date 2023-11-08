@@ -2,8 +2,10 @@ package fi.indigon.kd_filmrandomizer
 
 import android.content.Context
 import android.os.Parcelable
+import android.util.Log
 import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 @Parcelize
@@ -72,24 +74,34 @@ data class Film(
 object FilmUtils {
 
     fun jsonToFilms(jsonData: JSONArray): List<Film> {
-        val filmList = mutableListOf<Film>()
+        val filmList: MutableList<Film> = mutableListOf()
 
         for (i in 0 until jsonData.length()) {
-            val jsonObject = jsonData.getJSONObject(i)
+            try {
+                val jsonObject: JSONObject = jsonData.getJSONObject(i)
 
-            val title = jsonObject.getString("filmTitle")
-            val genresJson = jsonObject.getJSONArray("filmGenresIDs")
-            val isWatched = jsonObject.getInt("filmIsWatched")
-            val genresList = (0 until genresJson.length()).map {
-                Film.Genre.fromId(genresJson.getInt(it))
+                val title: String = jsonObject.getString("filmTitle")
+                val genresJson: JSONArray = jsonObject.getJSONArray("filmGenresIDs")
+                val isWatched: Int = jsonObject.getInt("filmIsWatched")
+
+                val genresList: List<Film.Genre> = (0 until genresJson.length()).map {
+                    Film.Genre.fromId(genresJson.getInt(it))
+                }
+
+                val id: Int = jsonObject.getInt("filmID")
+
+                filmList.add(Film(title, genresList, isWatched == 1, id))
+            } catch (e: JSONException) {
+                // If there's an error, add a placeholder film to the list
+                filmList.add(Film("Error: Film data is invalid", emptyList(), false))
+                // Optionally, log the error or inform the user
+                Log.e("jsonToFilms", "Error parsing JSON for film at index $i: ${e.message}")
             }
-            val id = jsonObject.getInt("filmID")
-
-            filmList.add(Film(title, genresList, isWatched == 1, id))
         }
 
         return filmList
     }
+
 
     fun intArrayToGenresList(intArray: IntArray): List<Film.Genre> {
         val genresList = mutableListOf<Film.Genre>()
