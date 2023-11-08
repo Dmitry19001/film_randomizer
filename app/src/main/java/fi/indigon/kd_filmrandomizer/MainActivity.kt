@@ -13,9 +13,8 @@ import kotlinx.coroutines.launch
 
 val FilmList = mutableListOf<Film>()
 
-
 class MainActivity : LocalizedActivity(){
-
+//class MainActivity : ComponentActivity(){
     private lateinit var filmActivity: ActivityResultLauncher<Intent>
     private lateinit var loadingDialog: LoadingDialog
     private var sheetURL = ""
