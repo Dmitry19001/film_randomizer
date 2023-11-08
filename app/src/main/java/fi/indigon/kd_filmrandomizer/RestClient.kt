@@ -55,6 +55,7 @@ class RestClient(private val context: Context, private val sheetURL: String) {
                     protocol = URLProtocol.HTTPS
                 }
                 parameter("sheetURL", sheetURL)
+                if (DEV_MODE) {parameter("devMode", 1)}
             }
 
             when (response.status.value) {

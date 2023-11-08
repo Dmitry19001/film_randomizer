@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 val FilmList = mutableListOf<Film>()
+const val DEV_MODE = true
 
 class MainActivity : LocalizedActivity(){
 //class MainActivity : ComponentActivity(){

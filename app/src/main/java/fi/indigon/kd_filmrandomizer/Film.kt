@@ -46,6 +46,7 @@ data class Film(
 
     fun toJson(apiAction: APIAction, sheetURL: String): JSONObject {
         val filmJson = JSONObject().apply {
+            if (DEV_MODE) {put("devMode", 1)}
             put("apiAction", apiAction.name)
             put("sheetURL", sheetURL)
             put("filmTitle", title)
