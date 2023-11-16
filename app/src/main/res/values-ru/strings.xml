@@ -32,14 +32,11 @@
     <string name="genres_choose">Выбрать жанры</string>
     <string name="button_clear_all">Очистить выбор</string>
     <string name="film_already_exists">Такой фильм уже есть!</string>
-    <string name="upload_error">ERROR: Unable to upload</string>
+    <string name="upload_error">Ошибка: Неудалось отправить изменения</string>
     <string name="settings_info_title">Информация о приложении</string>
     <string name="genre_series">Сериал</string>
     <string name="genre_animation">Анимация</string>
     <string name="error_empty_genre">Нужно добавить хотя-бы один жанр!</string>
-    <string name="setting_googleSheet_URL">Сюда вставляется ссылка на вашу таблицу Google</string>
-    <string name="setting_googleSheet_URL_title">URL таблицы Google</string>
-    <string name="error_undefined_sheetUrl">Ссылка на таблицу Google не найдена! Пожалуйста укажите ссылку в настройках.</string>
     <string name="setting_app_version_title">Версия приложения</string>
     <string name="app_name">Рандомайзер Кино</string>
     <string name="button_randomize">Рандомизировать</string>

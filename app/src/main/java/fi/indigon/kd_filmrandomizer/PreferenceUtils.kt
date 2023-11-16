@@ -48,4 +48,18 @@ object PreferenceUtils {
 
     }
 
+    fun initDevMode(context: Context) {
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val useDevMode = sharedPreferences.getBoolean("setting_dev_mode", false)
+
+        val version = getAppVersion(context)
+        if (version.contains("_DEBUG") && useDevMode) { DataHolder.setDevMode(true) }
+    }
+
+    fun initFilteringPreference(context: Context) {
+        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val watchedFilterSetting = sharedPreferences.getBoolean("setting_watched_filter", false)
+        DataHolder.setFilterWatchedSetting(watchedFilterSetting)
+    }
+
 }

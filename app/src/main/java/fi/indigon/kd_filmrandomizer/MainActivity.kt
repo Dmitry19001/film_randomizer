@@ -16,9 +16,14 @@ class MainActivity : LocalizedActivity() {
     private lateinit var loadingDialog: LoadingDialog
 
     private val filmList = mutableListOf<Film>()
+    private var visibleFilmsList = mutableListOf<Film>()
+    private val filmAdapter = FilmListAdapter(this, visibleFilmsList)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        PreferenceUtils.initFilteringPreference(this)
+        PreferenceUtils.initDevMode(this)
 
         setContentView(R.layout.activity_main)
 
@@ -29,7 +34,7 @@ class MainActivity : LocalizedActivity() {
         //        }
         //endregion
 
-        val filmAdapter = FilmListAdapter(this, filmList) // Replace with your data source
+        setupFilmAdapterCallbacks()
 
         loadingDialog = LoadingDialog(this)
 
@@ -37,27 +42,31 @@ class MainActivity : LocalizedActivity() {
         filmActivity =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
                 // Requesting new data
-                requestFilms(filmAdapter)
+                requestFilms()
 
                 // Clearing singleton data
                 DataHolder.clearData()
             }
 
-        setupFilmAdapterCallbacks(filmAdapter)
-
         // Initializing ListView and its Adapter
         val listView = findViewById<ListView>(R.id.filmList)
 
         // Requesting data
-        requestFilms(filmAdapter)
+        requestFilms()
 
         // Initializing buttons
-        initButtons(filmAdapter)
+        initButtons()
 
         listView.adapter = filmAdapter
     }
 
-    private fun setupFilmAdapterCallbacks(filmAdapter: FilmListAdapter) {
+    override fun onResume() {
+        super.onResume()
+        PreferenceUtils.initDevMode(this)
+        requestFilms()
+    }
+
+    private fun setupFilmAdapterCallbacks() {
         filmAdapter.setOnFilmDeleteListener { film ->
             val restClient = RestClient(this)
 
@@ -67,7 +76,7 @@ class MainActivity : LocalizedActivity() {
                 val (isDone, responseCode) = restClient.postFilmData(film, APIAction.DELETE)
                 if (isDone) {
                     println("SUCCESS TO DELETE $film")
-                    requestFilms(filmAdapter)
+                    requestFilms()
                 } else {
                     println("ERROR TO DELETE $responseCode $film")
                 }
@@ -91,7 +100,7 @@ class MainActivity : LocalizedActivity() {
                     loadingDialog.dismiss()
                 }
 
-                requestFilms(filmAdapter)
+                requestFilms()
 
                 return@setOnFilmEditListener
             }
@@ -102,7 +111,7 @@ class MainActivity : LocalizedActivity() {
         }
     }
 
-    private fun requestFilms(filmAdapter: FilmListAdapter) {
+    private fun requestFilms() {
         loadingDialog.show()
 
         val restClient = RestClient(this)
@@ -118,13 +127,16 @@ class MainActivity : LocalizedActivity() {
                 filmList.clear()
                 filmList.addAll(FilmUtils.jsonToFilms(json))
 
+                visibleFilmsList.clear()
+                visibleFilmsList.addAll(FilmUtils.sortFilmList(filmList, FilmUtils.SortCriteria.TITLE_ASCENDING, DataHolder.SettingFilterWatched))
+
                 filmAdapter.notifyDataSetChanged()
                 loadingDialog.dismiss()
             }
         }
     }
 
-    private fun initButtons(filmAdapter: FilmListAdapter) {
+    private fun initButtons() {
         // ADD NEW FILM BUTTON
         val buttonAddNewFilm = findViewById<Button>(R.id.buttonAddNew)
         buttonAddNewFilm.setOnClickListener {
@@ -142,7 +154,7 @@ class MainActivity : LocalizedActivity() {
         // SYNC BUTTON
         val buttonSync = findViewById<Button>(R.id.buttonSync)
         buttonSync.setOnClickListener {
-            requestFilms(filmAdapter)
+            requestFilms()
         }
 
         // RANDOMIZER BUTTON

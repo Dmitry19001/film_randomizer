@@ -110,4 +110,36 @@ object FilmUtils {
             Genre.fromId(intArray[index])
         }
     }
+
+    private fun filterWatched(filmList: MutableList<Film>): MutableList<Film> {
+        return filmList.filter { film -> !film.isWatched }.toMutableList()
+    }
+
+    enum class SortCriteria {
+        TITLE_ASCENDING,
+        TITLE_DESCENDING,
+        WATCHED,
+        UNWATCHED
+    }
+
+    fun sortFilmList(filmList : MutableList<Film>, criteria: SortCriteria, watchedIsFiltered : Boolean) : MutableList<Film> {
+        println("Film list length ${filmList.count()}")
+        var visibleFilmsList = filmList.toMutableList() // Start with a copy of the full list
+
+        if (watchedIsFiltered) {
+            visibleFilmsList = filterWatched(visibleFilmsList)
+        }
+
+        // Apply sorting
+        when (criteria) {
+            SortCriteria.TITLE_ASCENDING -> visibleFilmsList.sortBy { it.title }
+            SortCriteria.TITLE_DESCENDING -> visibleFilmsList.sortByDescending { it.title }
+            SortCriteria.WATCHED -> visibleFilmsList.sortBy { it.isWatched }
+            SortCriteria.UNWATCHED -> visibleFilmsList.sortByDescending { it.isWatched }
+        }
+
+        println("VisibleFilm list length ${visibleFilmsList.count()}")
+
+        return visibleFilmsList
+    }
 }

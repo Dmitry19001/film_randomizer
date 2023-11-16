@@ -37,9 +37,6 @@
     <string name="genre_series">Series</string>
     <string name="genre_animation">Animation</string>
     <string name="error_empty_genre">There is too few genres!</string>
-    <string name="setting_googleSheet_URL">Here goes link to your Google Sheet</string>
-    <string name="setting_googleSheet_URL_title">Google Sheet URL</string>
-    <string name="error_undefined_sheetUrl">Undefined Google Sheet URL. Please define it in settings to continue!</string>
     <string name="setting_app_version_title">App version</string>
     <string name="app_name">FilmRandmizer</string>
     <string name="button_randomize">Randomize</string>

@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
 
-class GenresListAdapter(private val context: Context, private val genres: Array<String>) :  BaseAdapter(){
+class GenresListAdapter(private val context: Context, private val genres: Array<String>) :
+    BaseAdapter() {
     override fun getCount(): Int {
         return genres.size
     }
