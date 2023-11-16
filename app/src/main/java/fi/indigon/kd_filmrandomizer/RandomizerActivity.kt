@@ -7,14 +7,30 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
+import fi.indigon.kd_filmrandomizer.DataHolder.FilmArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class RandomizerActivity : LocalizedActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_randomizer)
+
+        // Checking if FilmArray not defined
+        if (FilmArray == null) {
+            AlertDialog.Builder(this)
+                .setTitle("Warning")
+                .setMessage("Film list is empty, Activity will be closed!")
+                .setPositiveButton(this.getString(R.string.button_ok)) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+
+            // if not defined closing activity
+            finish()
+        }
 
         initUI()
     }
@@ -27,30 +43,39 @@ class RandomizerActivity : LocalizedActivity() {
 
         buttonRandomize.setOnClickListener {
             // getting chosen genres for filtering
-            val genreIds = multipleGenreChoiceWidget.getSelectedGenres().mapIndexed{ index, value ->
-                if (value) index // If true adding index = genreID to array
-                else null }
-                .filterNotNull() // Filtering out null values
-                .toIntArray()
+            val genreIds =
+                multipleGenreChoiceWidget.getSelectedGenres().mapIndexed { index, value ->
+                    if (value) index // If true adding index = genreID to array
+                    else null
+                }
+                    .filterNotNull() // Filtering out null values
+                    .toIntArray()
 
             val filmList = if (genreIds.isNotEmpty()) {
-                FilmList.filter { film ->
+                FilmArray!!.filter { film ->
                     // Finding any same genre
-                    film.genres.any{ genre ->
+                    film.genres.any { genre ->
                         genreIds.any { chosenGenre ->
                             genre.id == chosenGenre
                         }
                     }
                 }
-            }
-            else {
-                FilmList // No sorting
+            } else {
+                FilmArray!!.toMutableList() // No sorting
             }
 
-            Snackbar.make(findViewById(R.id.randomizerLayout), "${FilmList.count() - filmList.count()} was filtered out of ${FilmList.count()} films", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(
+                findViewById(R.id.randomizerLayout),
+                "${FilmArray!!.count() - filmList.count()} was filtered out of ${FilmArray!!.count()} films",
+                Snackbar.LENGTH_SHORT
+            ).show()
 
             if (filmList.isEmpty()) {
-                Snackbar.make(findViewById(R.id.randomizerLayout), "No films to get random from", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    findViewById(R.id.randomizerLayout),
+                    "No films to get random from",
+                    Snackbar.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -77,7 +102,7 @@ class RandomizerActivity : LocalizedActivity() {
         loadingDialog.show()
 
         // Setting up client
-        val restClient = RestClient(this, PreferenceUtils.getGoogleSheetUrl(this))
+        val restClient = RestClient(this)
 
         lifecycleScope.launch(Dispatchers.Main) {
             // Marking film as watched

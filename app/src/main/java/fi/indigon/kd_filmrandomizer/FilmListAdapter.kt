@@ -1,4 +1,5 @@
 package fi.indigon.kd_filmrandomizer
+
 import android.content.Context
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -10,7 +11,6 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
-import kotlinx.coroutines.DelicateCoroutinesApi
 
 class FilmListAdapter(
     private val context: Context,
@@ -26,7 +26,6 @@ class FilmListAdapter(
     fun interface OnFilmEditListener {
         fun onFilmEdit(film: Film, watchedOnly: Boolean)
     }
-
 
     private class ViewHolder(view: View) {
         val titleTextView: TextView
@@ -62,7 +61,6 @@ class FilmListAdapter(
         return position.toLong()
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val film = getItem(position) as Film
         val listItemView: View
@@ -70,7 +68,7 @@ class FilmListAdapter(
 
         if (convertView == null) {
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            listItemView = inflater.inflate(R.layout.list_item_layout, null)
+            listItemView = inflater.inflate(R.layout.list_item_layout, parent, false)
             viewHolder = ViewHolder(listItemView)
             listItemView.tag = viewHolder
         } else {
@@ -78,18 +76,27 @@ class FilmListAdapter(
             viewHolder = listItemView.tag as ViewHolder
         }
 
-        viewHolder.titleTextView.text = film.title
-        viewHolder.genreTextView.text = "${context.getString(R.string.genres)}: ${film.genresToString(context)}"
+        setupTexts(viewHolder, film)
 
-        val watchedText = "${context.getString(R.string.is_watched_header)}: ${
-            if (film.isWatched) context.getString(R.string.yes) else context.getString(R.string.no)
-        }"
-        viewHolder.watchedTextView.text = watchedText
+        setupButtons(viewHolder, film)
 
+        listItemView.setOnLongClickListener {
+            vibrateForFeedback(context)
+            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible
+            true // Return true to indicate the long press is handled
+        }
 
+        return listItemView
+    }
+
+    private fun setupButtons(
+        viewHolder: ViewHolder,
+        film: Film
+    ) {
         // Handling Cancel Button
         viewHolder.buttonCancelEdit.setOnClickListener {
-            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible // Hiding deletion panel
+            viewHolder.filmEditPanel.isVisible =
+                !viewHolder.filmEditPanel.isVisible // Hiding deletion panel
         }
 
         // Handling Delete Button
@@ -110,14 +117,24 @@ class FilmListAdapter(
             onFilmEditListener?.onFilmEdit(film, true) // Only need to send that film is watched
             viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible // Hiding panel
         }
+    }
 
-        listItemView.setOnLongClickListener {
-            vibrateForFeedback(context)
-            viewHolder.filmEditPanel.isVisible = !viewHolder.filmEditPanel.isVisible
-            true // Return true to indicate the long press is handled
+    private fun setupTexts(
+        viewHolder: ViewHolder,
+        film: Film
+    ) {
+        // Setting title
+        viewHolder.titleTextView.text = film.title
+        // Setting genres
+        "${context.getString(R.string.genres)}: ${film.genresToString(context)}".also {
+            viewHolder.genreTextView.text = it
         }
 
-        return listItemView
+        // Setting watched text
+        val watchedText = "${context.getString(R.string.is_watched_header)}: ${
+            if (film.isWatched) context.getString(R.string.yes) else context.getString(R.string.no)
+        }"
+        viewHolder.watchedTextView.text = watchedText
     }
 
     fun setOnFilmDeleteListener(listener: OnFilmDeleteListener?) {
@@ -134,14 +151,12 @@ class FilmListAdapter(
         // Check if the device has a vibrator
         if (vibrator.hasVibrator()) {
             // Vibrate for a short period, e.g., 50 milliseconds
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                // For API 26 and above
-                vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                // For API 25 and below
-                @Suppress("DEPRECATION")
-                vibrator.vibrate(50)
-            }
+            vibrator.vibrate(
+                VibrationEffect.createOneShot(
+                    50,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
         }
     }
 }

@@ -1,6 +1,7 @@
 package fi.indigon.kd_filmrandomizer
 
 import android.content.Context
+import fi.indigon.kd_filmrandomizer.DataHolder.DevMode
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.request.get
@@ -35,42 +36,35 @@ enum class ResponseCode {
     NOT_FOUND;
 }
 
-class RestClient(private val context: Context, private val sheetURL: String) {
+class RestClient(context: Context) {
     private val client = HttpClient(OkHttp)
-    private val apiURL = URL(context.getString(R.string.RESTApiLink))
+    private val apiURL = URL(context.getString(R.string.GoogleAppLink))
 
     fun interface OnDataLoadedListener {
         fun onDataLoaded(data: JSONArray?)
     }
 
-    fun interface OnDataUploadedListener {
-        fun onDataUploaded(success: Boolean, responseCode: ResponseCode)
-    }
-
     suspend fun getFilmsData(callback: OnDataLoadedListener) {
         try {
-            println("Connecting...")
             val response = client.get(apiURL) {
                 url {
                     protocol = URLProtocol.HTTPS
                 }
-                parameter("sheetURL", sheetURL)
-                if (DEV_MODE) {parameter("devMode", 1)}
+                if (DevMode) {
+                    // passing the devmode parameter
+                    parameter("devMode", 1)
+                }
             }
 
             when (response.status.value) {
                 in 200..299 -> {
-                    println("Connection success!")
                     val responseBody = response.readBytes().toString(Charsets.UTF_8)
-                    println(responseBody)
                     val jsonArray = if (responseBody.isNotEmpty()) JSONArray(responseBody) else null
                     callback.onDataLoaded(jsonArray)
                 }
-                else -> {
-                    val responseBody = response.readBytes().toString(Charsets.UTF_8)
-                    println(responseBody)
 
-                    println("Failed to load data... ${response.status.value}")
+                else -> {
+                    //val responseBody = response.readBytes().toString(Charsets.UTF_8)
                     callback.onDataLoaded(null)
                 }
             }
@@ -96,9 +90,6 @@ class RestClient(private val context: Context, private val sheetURL: String) {
         val status = response.status
         val responseText = response.readBytes().toString(Charsets.UTF_8)
 
-        println("Status $status")
-        println("ResponseText $responseText")
-
         val responseCode = when (status.value) {
             in 200..299 -> {
                 when (responseText) {
@@ -108,6 +99,7 @@ class RestClient(private val context: Context, private val sheetURL: String) {
                     else -> ResponseCode.UPLOADED_SUCCESSFULLY
                 }
             }
+
             404 -> ResponseCode.NOT_FOUND
             else -> ResponseCode.UNKNOWN_ERROR
         }
@@ -123,9 +115,10 @@ class RestClient(private val context: Context, private val sheetURL: String) {
                         protocol = URLProtocol.HTTPS
                     }
                     contentType(ContentType.Application.Json)
-                    setBody(film.toJson(apiAction, sheetURL).toString())
+                    setBody(film.toJson(apiAction).toString())
                 }
 
+                // Checking redirect
                 val finalResponse = if (initialResponse.status.value in 300..399) {
                     handleRedirection(initialResponse)
                 } else {

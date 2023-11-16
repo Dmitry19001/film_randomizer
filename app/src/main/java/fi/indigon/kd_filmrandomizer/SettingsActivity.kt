@@ -2,8 +2,10 @@ package fi.indigon.kd_filmrandomizer
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.SwitchPreference
 
 class SettingsActivity : AppCompatActivity() {
 
@@ -23,6 +25,30 @@ class SettingsActivity : AppCompatActivity() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
 
+            initLanguageSetting()
+
+            initAppVersion()
+
+            //initWatchedFilterSetting()
+        }
+
+        private fun initWatchedFilterSetting() {
+            val watchedFilterPreference = findPreference<SwitchPreference>("setting_watched_filter")
+
+            TODO()
+        }
+
+
+        private fun initAppVersion() {
+            val currentVersion = PreferenceUtils.getAppVersion(requireContext())
+            val versionPreference = findPreference<EditTextPreference>("app_version")
+
+            versionPreference?.let {
+                it.title = currentVersion
+            }
+        }
+
+        private fun initLanguageSetting() {
             val languagePreference = findPreference<ListPreference>("setting_app_language")
 
             languagePreference?.let {
@@ -32,7 +58,7 @@ class SettingsActivity : AppCompatActivity() {
                     val selectedLanguage = newValue.toString()
                     it.summary = selectedLanguage
 
-                    updateAppLanguage(selectedLanguage, requireContext())
+                    PreferenceUtils.updateAppLanguage(selectedLanguage, requireContext())
                     true
                 }
             }

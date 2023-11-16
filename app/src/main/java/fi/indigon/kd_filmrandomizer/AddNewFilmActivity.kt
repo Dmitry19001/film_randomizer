@@ -11,12 +11,9 @@ import kotlinx.coroutines.launch
 class AddNewFilmActivity : LocalizedActivity() {
 
     private lateinit var loadingDialog: LoadingDialog
-    private var sheetURL = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sheetURL = PreferenceUtils.getGoogleSheetUrl(this)
 
         loadingDialog = LoadingDialog(this)
 
@@ -28,7 +25,7 @@ class AddNewFilmActivity : LocalizedActivity() {
     private fun initUI() {
         val titleInput = findViewById<EditText>(R.id.filmTitle)
         val buttonSubmitNewFilm = findViewById<Button>(R.id.button_submit_new)
-        val restClient = RestClient(this, sheetURL)
+        val restClient = RestClient(this)
 
         val multipleChoice = findViewById<TextView>(R.id.genresMultiselect)
 
@@ -60,12 +57,12 @@ class AddNewFilmActivity : LocalizedActivity() {
             else null
         }.filterNotNull().toIntArray()
 
-        val genres = FilmUtils.intArrayToGenresList(genresIDs)
+        val genres = FilmUtils.intArrayToGenresArray(genresIDs)
 
         if (title.isNotEmpty() && genres.isNotEmpty()) {
             loadingDialog.show()
 
-            val film = Film(title, genres)
+            val film = Film(0, title, genres)
 
             lifecycleScope.launch {
                 val (isDone, responseCode) = restClient.postFilmData(

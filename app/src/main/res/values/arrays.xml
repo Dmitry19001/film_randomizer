@@ -7,18 +7,4 @@
         <item>ru</item>
         <item>en</item>
     </string-array>
-    <string-array name="genre_names">
-        <item>@string/genre_comedy</item>
-        <item>@string/genre_drama</item>
-        <item>@string/genre_action</item>
-        <item>@string/genre_documentary</item>
-        <item>@string/genre_musical</item>
-        <item>@string/genre_romance</item>
-        <item>@string/genre_science_fiction</item>
-        <item>@string/genre_crime</item>
-        <item>@string/genre_fantasy</item>
-        <item>@string/genre_thriller</item>
-        <item>@string/genre_series</item>
-        <item>@string/genre_animation</item>
-    </string-array>
 </resources>

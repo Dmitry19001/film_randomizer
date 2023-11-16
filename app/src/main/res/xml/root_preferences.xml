@@ -5,15 +5,6 @@
         app:iconSpaceReserved="false"
         app:title="@string/main_settings_header">
 
-        <EditTextPreference
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:selectAllOnFocus="true"
-            android:singleLine="true"
-            android:title="@string/setting_googleSheet_URL_title"
-            app:iconSpaceReserved="false"
-            app:key="setting_sheet_url"
-            app:summary="@string/setting_googleSheet_URL" />
         <ListPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -24,6 +15,11 @@
             android:title="@string/language_setting_title"
             app:iconSpaceReserved="false"
             app:summary="ru" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="setting_watched_filter"
+            android:title="@string/setting_watched_filter"
+            app:iconSpaceReserved="false" />
 
     </PreferenceCategory>
     <PreferenceCategory
@@ -41,6 +37,7 @@
             app:enableCopying="false"
             app:enabled="false"
             app:iconSpaceReserved="false"
+            app:key="app_version"
             app:persistent="false"
             app:selectable="false" />
 

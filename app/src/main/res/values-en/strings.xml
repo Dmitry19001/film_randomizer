@@ -51,4 +51,5 @@
     <string name="loading">Loading…</string>
     <string name="question_mark_watched">Do you want to mark it watched?</string>
     <string name="title_activity_editor">Editor</string>
+    <string name="setting_watched_filter">Hide wathced films</string>
 </resources>

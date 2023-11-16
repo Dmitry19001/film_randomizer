@@ -7,7 +7,7 @@ import androidx.appcompat.app.AlertDialog
 class MultipleGenreChoiceWidget(
     private val context: Context,
     private val textView: TextView,
-    private val preselectedGenres: List<Film.Genre>? = null
+    private val preselectedGenres: Array<Genre>? = null
 ) {
 
     private var selectedGenres: BooleanArray = booleanArrayOf()
@@ -20,7 +20,7 @@ class MultipleGenreChoiceWidget(
         return selectedGenres
     }
 
-    private fun preselectGenres(selectedGenresList: ArrayList<Int>, genres: Array<Film.Genre>) {
+    private fun preselectGenres(selectedGenresList: ArrayList<Int>, genres: Array<Genre>) {
         for (genre in preselectedGenres!!) {
             selectedGenresList.add(genre.id)
             selectedGenres[genre.id] = true
@@ -35,7 +35,7 @@ class MultipleGenreChoiceWidget(
     private fun initMultipleGenreChoiceWidget() {
         val selectedGenresList = arrayListOf<Int>()
 
-        val genres = Film.Genre.getAll()
+        val genres = Genre.getAll()
         val genreNames = genres.map { it.getDisplayName(context) }.toTypedArray()
 
         selectedGenres = BooleanArray(genres.size)

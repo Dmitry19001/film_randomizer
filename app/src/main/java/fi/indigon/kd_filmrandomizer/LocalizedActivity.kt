@@ -12,8 +12,11 @@ open class LocalizedActivity : AppCompatActivity() {
     }
 
     private fun updateBaseContextLocale(context: Context): Context {
-        val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val languageCode = sharedPreferences.getString("setting_app_language", Locale.getDefault().language) ?: Locale.getDefault().language
+        val sharedPreferences: SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(context)
+        val languageCode =
+            sharedPreferences.getString("setting_app_language", Locale.getDefault().language)
+                ?: Locale.getDefault().language
         val locale = Locale(languageCode)
         Locale.setDefault(locale)
 

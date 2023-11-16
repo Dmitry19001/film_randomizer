@@ -22,17 +22,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            tools:text="titleTextView" />
 
         <TextView
             android:id="@+id/genreTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            tools:text="genreTextV" />
 
         <TextView
             android:id="@+id/watchedTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            tools:text="watchedTextView" />
 
     </LinearLayout>
 

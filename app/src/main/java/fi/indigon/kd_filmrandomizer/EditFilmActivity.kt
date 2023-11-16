@@ -12,12 +12,9 @@ import kotlinx.coroutines.launch
 
 class EditFilmActivity : LocalizedActivity() {
     private lateinit var loadingDialog: LoadingDialog
-    private var sheetURL = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sheetURL = PreferenceUtils.getGoogleSheetUrl(this)
 
         loadingDialog = LoadingDialog(this)
 
@@ -26,13 +23,13 @@ class EditFilmActivity : LocalizedActivity() {
         val film = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getParcelableExtra("EXTRA_FILM", Film::class.java)
         } else {
+            @Suppress("DEPRECATION")
             intent.getParcelableExtra<Film>("EXTRA_FILM")
         }
 
         if (film != null) {
             initUI(film)
-        }
-        else {
+        } else {
             Snackbar.make(
                 findViewById(R.id.filmEditWindow),
                 "Nothing works here!",
@@ -43,14 +40,15 @@ class EditFilmActivity : LocalizedActivity() {
 
     private fun initUI(film: Film) {
         // RESTClient
-        val restClient = RestClient(this, sheetURL)
+        val restClient = RestClient(this)
 
         // Other
         val filmTitle = findViewById<EditText>(R.id.filmTitle)
         filmTitle.setText(film.title)
 
         val genresMultiselect = findViewById<TextView>(R.id.genresMultiselect)
-        val multipleGenreChoiceWidget = MultipleGenreChoiceWidget(this, genresMultiselect, film.genres)
+        val multipleGenreChoiceWidget =
+            MultipleGenreChoiceWidget(this, genresMultiselect, film.genres)
 
 
         // Checkbox
@@ -85,12 +83,12 @@ class EditFilmActivity : LocalizedActivity() {
             else null
         }.filterNotNull().toIntArray()
 
-        val genres = FilmUtils.intArrayToGenresList(genresIDs)
+        val genres = FilmUtils.intArrayToGenresArray(genresIDs)
 
         if (title.isNotEmpty() && genres.isNotEmpty()) {
             loadingDialog.show()
 
-            val film = Film(title, genres, isWatchedCheckBox.isChecked, filmId)
+            val film = Film(filmId, title, genres, isWatchedCheckBox.isChecked)
 
             lifecycleScope.launch {
                 val (isDone, responseCode) = restClient.postFilmData(
