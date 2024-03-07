@@ -1,6 +1,8 @@
 {
     "@@locale": "en",
 
+    "app_title" : "FilmRandomizer",
+
     "category_series": "Series",
     "category_animation": "Animation",
     "category_cartoon": "Cartoon",

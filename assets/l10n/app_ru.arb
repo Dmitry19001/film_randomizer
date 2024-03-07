@@ -1,5 +1,7 @@
 {
     "@@locale": "ru",
+
+    "app_title" : "FilmRandomizer",
     
     "category_series": "Series",
     "category_animation": "Animation",
