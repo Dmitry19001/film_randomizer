@@ -1,0 +1,23 @@
+{
+    "@@locale": "ru",
+    
+    "category_series": "Series",
+    "category_animation": "Animation",
+    "category_cartoon": "Cartoon",
+    "category_film": "Movie",
+    "category_anime": "Anime",
+
+
+    "genre_action": "Action",
+    "genre_comedy": "Comedy",
+    "genre_drama": "Drama",
+    "genre_thriller": "Thriller",
+    "genre_documentary": "Documentary",
+    "genre_musical": "Musical",
+    "genre_romance": "Romance",
+    "genre_scifi": "Scifi",
+    "genre_crime": "Crime",
+    "genre_fantasy": "Fantasy",
+    "genre_fiction": "Fiction",
+    "genre_detective": "Detective"
+}
