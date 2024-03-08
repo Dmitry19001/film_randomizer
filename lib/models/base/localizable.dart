@@ -6,7 +6,7 @@ abstract class Localizable {
   String get localizationId;
 
   String localizedName(BuildContext context) {
-    return L10nAccessor.get(context, localizationId) ?? localizationId;
+    return L10nAccessor.get(context, localizationId);
   }
 
   @override
