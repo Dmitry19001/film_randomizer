@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class L10nAccessor {
-  static String? get(BuildContext context, String localizationId) {
-    final Map<String, String? Function(BuildContext)> localizedStringGetters = {
+  static String get(BuildContext context, String localizationId) {
+    final Map<String, String Function(BuildContext)> localizedStringGetters = {
       'app_title': (context) => AppLocalizations.of(context)!.app_title,
+      'missing_title': (context) => AppLocalizations.of(context)!.missing_title,
+      'categories': (context) => AppLocalizations.of(context)!.categories,
+      'genres': (context) => AppLocalizations.of(context)!.genres,
       'category_series': (context) => AppLocalizations.of(context)!.category_series,
       'category_animation': (context) => AppLocalizations.of(context)!.category_animation,
       'category_cartoon': (context) => AppLocalizations.of(context)!.category_cartoon,
@@ -26,6 +29,6 @@ class L10nAccessor {
       'genre_detective': (context) => AppLocalizations.of(context)!.genre_detective,
     };
     final getter = localizedStringGetters[localizationId];
-    return getter != null ? getter(context) : null;
+    return getter != null ? getter(context) : localizationId;
   }
 }
