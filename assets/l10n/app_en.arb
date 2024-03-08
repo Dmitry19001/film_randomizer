@@ -3,6 +3,11 @@
 
     "app_title" : "FilmRandomizer",
 
+    "missing_title" : "Title missing!",
+    
+    "categories" : "Categories",
+    "genres" : "Genres",
+
     "category_series": "Series",
     "category_animation": "Animation",
     "category_cartoon": "Cartoon",
