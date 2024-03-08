@@ -27,14 +27,14 @@ Future<void> main() async {
   buffer.writeln("class L10nAccessor {");
 
   buffer.writeln("  static String? get(BuildContext context, String localizationId) {");
-  buffer.writeln("    final Map<String, String? Function(BuildContext)> _localizedStringGetters = {");
+  buffer.writeln("    final Map<String, String? Function(BuildContext)> localizedStringGetters = {");
 
   for (final key in keys) {
     buffer.writeln("      '$key': (context) => AppLocalizations.of(context)!.$key,");
   }
 
   buffer.writeln("    };");
-  buffer.writeln("    final getter = _localizedStringGetters[localizationId];");
+  buffer.writeln("    final getter = localizedStringGetters[localizationId];");
   buffer.writeln("    return getter != null ? getter(context) : null;");
   buffer.writeln("  }");
 
