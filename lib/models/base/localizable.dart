@@ -2,6 +2,7 @@ import 'package:film_randomizer/generated/localization_accessors.dart';
 import 'package:flutter/material.dart';
 
 abstract class Localizable {
+  String get id;
   String get localizationId;
 
   String localizedName(BuildContext context) {

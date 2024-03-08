@@ -8,4 +8,11 @@ class Genre extends Localizable{
   final String localizationId;
 
   Genre(this.id, this.localizationId);
+
+  factory Genre.fromJson(Map<String, dynamic> json) {
+    return Genre(
+      json['_id'],
+      json['localizationId'],
+    );
+  }
 }

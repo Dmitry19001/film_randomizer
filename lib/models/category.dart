@@ -9,4 +9,10 @@ class Category extends Localizable {
 
   Category(this.id, this.localizationId);
   
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
+      json['_id'],
+      json['localizationId'],
+    );
+  }
 }

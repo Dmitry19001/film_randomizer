@@ -9,6 +9,7 @@ class Film {
   bool isWatched;
   Set<Genre> genres;
   Set<Category> categories;
+  String? addedBy;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -18,6 +19,7 @@ class Film {
     this.isWatched = false,
     List<Genre>? genres,
     List<Category>? categories,
+    this.addedBy,
     this.createdAt,
     this.updatedAt,
   })  : genres = genres?.toSet() ?? {},
@@ -35,9 +37,29 @@ class Film {
     categories.add(category);
   }
 
+  factory Film.fromJson(Map<String, dynamic> json) {
+    List<Genre> genres = json['genres'] != null
+        ? List<Genre>.from(json['genres'].map((genreJson) => Genre.fromJson(genreJson)))
+        : [];
+
+    List<Category> categories = json['categories'] != null
+        ? List<Category>.from(json['categories'].map((categoryJson) => Category.fromJson(categoryJson)))
+        : [];
+
+    return Film(
+      id: json['_id'],
+      title: json['title'],
+      isWatched: json['isWatched'] ?? false, // Corrected typo
+      genres: genres,
+      categories: categories,
+      addedBy: json['addedBy'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+    );
+  }
+
   String toJson() {
     final Map<String, dynamic> data = {
-      'id': id,
       'title': title,
       'isWatched': isWatched,
       'genres': genres.map((genre) => genre.localizationId).toList(),
