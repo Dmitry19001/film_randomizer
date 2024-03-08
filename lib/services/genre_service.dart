@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class GenreService {
-  final String _baseUrl = apiBaseUrl;
+  final String _baseUrl = "$apiBaseUrl/genres";
   final Logger _logger = Logger();
 
   Future<List<Genre>?> getGenres() async {

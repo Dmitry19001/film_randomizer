@@ -5,7 +5,7 @@ import 'package:logger/logger.dart';
 import '../models/film.dart'; // Make sure this path matches your Film model
 
 class FilmService {
-  final String _baseUrl = apiBaseUrl;
+  final String _baseUrl = "$apiBaseUrl/films";
   final logger = Logger();
 
   Future<List<Film>?> getFilms() async {

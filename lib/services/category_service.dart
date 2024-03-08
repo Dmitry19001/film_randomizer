@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class CategoryService {
-  final String _baseUrl = apiBaseUrl;
+  final String _baseUrl = "$apiBaseUrl/categories";
   final Logger _logger = Logger();
 
   Future<List<Category>?> getCategories() async {
