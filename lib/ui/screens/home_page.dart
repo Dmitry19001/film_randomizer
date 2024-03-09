@@ -1,6 +1,7 @@
 import 'package:film_randomizer/ui/widgets/bottom_navigation_widget.dart';
 import 'package:film_randomizer/ui/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 import 'package:film_randomizer/models/film.dart';
 import 'package:film_randomizer/providers/film_provider.dart'; 
@@ -30,8 +31,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 return FilmDetailWidget(film: film);
               },
             )
-          : const Center(child: CircularProgressIndicator()), // Show loading indicator while films are loading
-      bottomNavigationBar: const CustomBottomNavigation(),
+          : const Center(child: CircularProgressIndicator()),
+      bottomNavigationBar: CustomBottomNavigation(
+        onSync: () async => {_syncFilms(filmProvider)},
+      ),
     );
+  }
+  
+  void _syncFilms(FilmProvider filmProvider) async {
+    Logger().d("Sync");
+    await filmProvider.loadFilms();
   }
 }
