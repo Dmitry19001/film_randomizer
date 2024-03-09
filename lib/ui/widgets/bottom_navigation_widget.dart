@@ -2,7 +2,9 @@ import 'package:film_randomizer/ui/screens/randomizer_page.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigation extends StatelessWidget {
-  const CustomBottomNavigation({super.key});
+  final VoidCallback? onSync;
+
+  const CustomBottomNavigation({super.key, this.onSync});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,7 @@ class CustomBottomNavigation extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.sync),
             onPressed: () {
-              
+              onSync?.call();
             },
           ),
           IconButton(
