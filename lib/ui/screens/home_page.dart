@@ -1,3 +1,5 @@
+import 'package:film_randomizer/ui/widgets/bottom_navigation_widget.dart';
+import 'package:film_randomizer/ui/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:film_randomizer/models/film.dart';
@@ -19,10 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final filmProvider = Provider.of<FilmProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(L10nAccessor.get(context, 'app_title')), // Assuming L10nAccessor setup is correctly done.
-      ),
+      appBar: const MainAppBar(),
       body: filmProvider.films != null
           ? ListView.builder(
               itemCount: filmProvider.films!.length,
@@ -31,7 +30,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 return FilmDetailWidget(film: film);
               },
             )
-          : Center(child: CircularProgressIndicator()), // Show loading indicator while films are loading
+          : const Center(child: CircularProgressIndicator()), // Show loading indicator while films are loading
+      bottomNavigationBar: const CustomBottomNavigation(),
     );
   }
 }
