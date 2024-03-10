@@ -16,4 +16,18 @@ class FilmProvider with ChangeNotifier {
     _films = await _filmService.getFilms();
     notifyListeners();
   }
+
+  Future<bool> createFilm(Film film) async {
+    Film?  createdFilm = await _filmService.createFilm(film.toJson());
+
+    loadFilms();
+    return createdFilm != null;
+  }
+
+  Future<bool> updateFilm(Film film) async {
+    Film? updatedFilm = await _filmService.updateFilm(film.id!, film.toJson());
+
+    loadFilms();
+    return updatedFilm != null;
+  }
 }
