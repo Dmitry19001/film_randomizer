@@ -18,7 +18,7 @@ void main() async {
   runApp(
     ChangeNotifierProvider(
       create: (context) => settingsProvider,
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -28,6 +28,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+
     return MultiProvider(
       providers: _buildProviders(context),
       child: MaterialApp(
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
           Logger().d("App title is: $title");
           return title;
         },
-        theme: DefaultTheme.themeData,
+        theme: settingsProvider.theme,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const MyHomePage(),
