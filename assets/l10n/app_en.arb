@@ -19,6 +19,10 @@
     "is_watched" : "Watched",
     "submit" : "Submit",
     "edit" : "Edit",
+    "show_watched": "Show watched films",
+    "language": "Language",
+    "theme": "Theme",
+    "app_version": "App version",
 
     "settings_page" : "Settings",
     "edit_page" : "Edit film",
