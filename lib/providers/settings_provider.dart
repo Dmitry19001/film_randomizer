@@ -6,11 +6,11 @@ import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider with ChangeNotifier {
-  String _language;
+  Locale _language;
   bool _showWatched;
   ThemeData _themeData;
 
-  static const defaultLanguage = 'en';
+  static const defaultLanguage = Locale('en');
   static const defaultShowWatched = true;
   static final defaultTheme = DefaultTheme.themeData;
 
@@ -19,16 +19,16 @@ class SettingsProvider with ChangeNotifier {
         _showWatched = defaultShowWatched,
         _themeData = defaultTheme;
 
-  String get language => _language;
+  Locale get language => _language;
   bool get showWatched => _showWatched;
   ThemeData get theme => _themeData;
 
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    _language = prefs.getString('language') ?? 
+    final languageString = prefs.getString('language') ?? 
         ui.PlatformDispatcher.instance.locale.toLanguageTag().substring(0, 2);
-    _language = _language.isEmpty ? defaultLanguage : _language;
+    _language = languageString.isEmpty ? defaultLanguage : Locale(languageString);
 
     _showWatched = prefs.getBool('showWatched') ?? defaultShowWatched;
 
@@ -47,9 +47,9 @@ class SettingsProvider with ChangeNotifier {
     }
   }
 
-  Future<void> setLanguage(String language) async {
+  Future<void> setLanguage(Locale language) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('language', language);
+    await prefs.setString('language', language.languageCode);
     _language = language;
     notifyListeners();
   }

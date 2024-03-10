@@ -33,15 +33,12 @@ class SettingsScreen extends StatelessWidget {
     return ListTile(
       title: Text(L10nAccessor.get(context, 'language')),
       trailing: DropdownButton<Locale>(
-        // Set the current locale as the value
-        value: Locale(provider.language),
-        // Update the language in the provider when a new locale is selected
+        value: provider.language,
         onChanged: (Locale? newValue) {
           if (newValue != null) {
-            provider.setLanguage(newValue.toLanguageTag());
+            provider.setLanguage(newValue);
           }
         },
-        // Map supported locales to DropdownMenuItem widgets
         items: supportedLocales.map<DropdownMenuItem<Locale>>((Locale locale) {
           return DropdownMenuItem<Locale>(
             value: locale,
