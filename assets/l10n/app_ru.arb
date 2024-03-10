@@ -4,6 +4,12 @@
     "app_title" : "FilmRandomizer",
     
     "missing_title" : "Title missing!",
+    "error_occurred" : "Error occured!",
+    "film_created_error" : "Error occured during creation!",
+    "film_updated_error" : "Error occured during update!",
+
+    "film_created_successfully" : "Film created successfully!",
+    "film_updated_successfully" : "Film updated successfully!",
     
     "title" : "Title",
     "select_categories" : "Select Categories",
@@ -12,6 +18,7 @@
     "genres" : "Genres",
     "is_watched" : "Watched",
     "submit" : "Submit",
+    "edit" : "Edit",
 
     "settings_page" : "Settings",
     "edit_page" : "Edit film",
