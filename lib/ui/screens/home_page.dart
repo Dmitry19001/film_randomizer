@@ -1,3 +1,4 @@
+import 'package:film_randomizer/providers/settings_provider.dart';
 import 'package:film_randomizer/ui/screens/film_add_edit_page.dart';
 import 'package:film_randomizer/ui/widgets/bottom_navigation_widget.dart';
 import 'package:film_randomizer/ui/widgets/main_app_bar.dart';
@@ -20,6 +21,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     // Accessing the FilmProvider
     final filmProvider = Provider.of<FilmProvider>(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+
+    if (!settingsProvider.showWatched) filmProvider.filterWatched();
 
     return Scaffold(
       appBar: const MainAppBar(),
