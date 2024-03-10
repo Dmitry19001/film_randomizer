@@ -1,3 +1,4 @@
+import 'package:film_randomizer/ui/screens/film_add_edit_page.dart';
 import 'package:film_randomizer/ui/widgets/bottom_navigation_widget.dart';
 import 'package:film_randomizer/ui/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,15 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             )
           : const Center(child: CircularProgressIndicator()),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () => {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => FilmEditPage(film: Film(),)),
+          )
+        },
+      ),
       bottomNavigationBar: CustomBottomNavigation(
         onSync: () async => {_syncFilms(filmProvider)},
       ),
