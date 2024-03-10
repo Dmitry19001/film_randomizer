@@ -39,6 +39,7 @@ dependencies:
   material: ^1.0.0+2
   intl: ^0.18.1
   shared_preferences: ^2.2.2
+  fluttertoast: ^8.2.4
   toastification: ^1.2.1
   flutter_localizations:
     sdk: flutter
