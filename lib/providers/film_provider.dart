@@ -30,4 +30,11 @@ class FilmProvider with ChangeNotifier {
     loadFilms();
     return updatedFilm != null;
   }
+
+  Future<void> filterWatched() async {
+    if(_films == null) return;
+
+    _films = _films!.where((film) => !film.isWatched).toList();
+    notifyListeners();
+  }
 }
