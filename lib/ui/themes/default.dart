@@ -3,23 +3,18 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static ThemeData get defaultTheme {
     return ThemeData(
-      // Define the default brightness and colors.
       brightness: Brightness.light,
       primaryColor: Colors.blue,
+      scaffoldBackgroundColor: Colors.white,
 
-      // Define the default font family.
       fontFamily: 'Montserrat',
 
-      // Define the default `TextTheme`. Use this to specify the default
-      // text styling for headlines, titles, bodies of text, and more.
       textTheme: const TextTheme(
         displayLarge: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
         titleLarge: TextStyle(fontSize: 16.0, fontStyle: FontStyle.italic),
         bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
       ),
 
-      // Define the default button theme. Use this to specify the default
-      // layout and colors of material buttons.
       buttonTheme: ButtonThemeData(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
         buttonColor: Colors.blue,
@@ -27,6 +22,19 @@ class AppTheme {
       ), 
       colorScheme: ColorScheme.fromSwatch().copyWith(
         secondary: Colors.blueAccent
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: MaterialStateProperty.all<Color>(Colors.blue),
+        trackOutlineColor: MaterialStateProperty.all<Color>(Colors.blue),
+        trackColor: MaterialStateProperty.resolveWith<Color>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.selected)) {
+              return Colors.blue.withOpacity(0.5); // Light blue for active state
+            }
+            return Colors.white; // Default color for inactive state
+          },
+        ),
       ),
     );
   }
