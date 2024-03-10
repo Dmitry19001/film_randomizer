@@ -2,6 +2,7 @@ import 'dart:ui' as ui;
 import 'package:film_randomizer/ui/themes/dark.dart';
 import 'package:film_randomizer/ui/themes/default.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsProvider with ChangeNotifier {
@@ -25,16 +26,25 @@ class SettingsProvider with ChangeNotifier {
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
 
-    _language = prefs.getString('language') ?? ui.PlatformDispatcher.instance.locale.toLanguageTag();
+    _language = prefs.getString('language') ?? 
+        ui.PlatformDispatcher.instance.locale.toLanguageTag().substring(0, 2);
     _language = _language.isEmpty ? defaultLanguage : _language;
 
     _showWatched = prefs.getBool('showWatched') ?? defaultShowWatched;
 
+    final storedBrightness = prefs.getString('theme');
+    final currentPlatformBrightness = ui.PlatformDispatcher.instance.platformBrightness;
+    _themeData = determineTheme(storedBrightness, currentPlatformBrightness);
 
-    final brightness = prefs.getString('theme') ?? ui.PlatformDispatcher.instance.platformBrightness.toString();
-    _themeData = brightness == 'Brightness.dark' ? DarkTheme.themeData : defaultTheme;
-  
     notifyListeners();
+  }
+
+  ThemeData determineTheme(String? storedBrightness, ui.Brightness currentPlatformBrightness) {
+    if (storedBrightness != null) {
+      return storedBrightness == 'dark' ? DarkTheme.themeData : defaultTheme;
+    } else {
+      return currentPlatformBrightness == ui.Brightness.dark ? DarkTheme.themeData : defaultTheme;
+    }
   }
 
   Future<void> setLanguage(String language) async {
@@ -56,5 +66,15 @@ class SettingsProvider with ChangeNotifier {
     await prefs.setString('theme', theme == DarkTheme.themeData ? 'dark' : 'light');
     _themeData = theme;
     notifyListeners();
+  }
+
+  void toggleTheme() {
+    if (_themeData == defaultTheme) {
+      setTheme(DarkTheme.themeData);
+      Logger().d(DarkTheme.themeData);
+    } else {
+      setTheme(defaultTheme);
+      Logger().d(defaultTheme);
+    }
   }
 }
