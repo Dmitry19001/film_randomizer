@@ -13,7 +13,7 @@ class L10nAccessor {
       'categories': (context) => AppLocalizations.of(context)!.categories,
       'select_genres': (context) => AppLocalizations.of(context)!.select_genres,
       'genres': (context) => AppLocalizations.of(context)!.genres,
-      'is_wathced': (context) => AppLocalizations.of(context)!.is_wathced,
+      'is_watched': (context) => AppLocalizations.of(context)!.is_watched,
       'settings_page': (context) => AppLocalizations.of(context)!.settings_page,
       'edit_page': (context) => AppLocalizations.of(context)!.edit_page,
       'add_page': (context) => AppLocalizations.of(context)!.add_page,

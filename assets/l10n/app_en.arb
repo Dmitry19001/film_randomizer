@@ -10,7 +10,7 @@
     "categories" : "Categories",
     "select_genres" : "Select Genres",
     "genres" : "Genres",
-    "is_wathced" : "Watched",
+    "is_watched" : "Watched",
 
     "settings_page" : "Settings",
     "edit_page" : "Edit film",
