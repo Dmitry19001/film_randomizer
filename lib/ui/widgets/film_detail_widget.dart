@@ -31,6 +31,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
         child: Stack(
           clipBehavior: Clip.none,
           children: [
+            _buildWatchedIndicator(),
             _buildCardContent(context),
             if (_isOverlayVisible) _buildOverlay(context),
           ]
@@ -51,20 +52,36 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
           ),
           const SizedBox(height: 8.0),
           Text(
-            "${L10nAccessor.get(context, "genres")}: ${widget.film.genres.map((genre) => genre.toString()).join(', ')}",
+            "${L10nAccessor.get(context, "genres")}: ${widget.film.genres.map((genre) => genre.localizedName(context)).join(', ')}",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 8.0),
           Text(
-            "${L10nAccessor.get(context, "categories")}: ${widget.film.categories.map((category) => category.toString()).join(', ')}",
+            "${L10nAccessor.get(context, "categories")}: ${widget.film.categories.map((category) => category.localizedName(context)).join(', ')}",
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 8.0),
           Text(
-            "Added by: ${widget.film.addedBy}",
-            style: Theme.of(context).textTheme.bodyMedium,
+            "${widget.film.addedBy}",
+            style: Theme.of(context).textTheme.labelSmall,
+            textAlign: TextAlign.end,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWatchedIndicator() {
+    return Positioned(
+      right: -25,
+      top: -25,
+      child: Container(
+        height: 50,
+        width: 50,
+        decoration: BoxDecoration(
+          color: widget.film.isWatched? Colors.green : Colors.yellow,
+          borderRadius: const BorderRadius.all(Radius.circular(25))
+        ),
       ),
     );
   }
