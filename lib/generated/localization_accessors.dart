@@ -31,6 +31,7 @@ class L10nAccessor {
       'category_film': (context) => AppLocalizations.of(context)!.category_film,
       'category_anime': (context) => AppLocalizations.of(context)!.category_anime,
       'genre_action': (context) => AppLocalizations.of(context)!.genre_action,
+      'genre_adventure': (context) => AppLocalizations.of(context)!.genre_adventure,
       'genre_comedy': (context) => AppLocalizations.of(context)!.genre_comedy,
       'genre_drama': (context) => AppLocalizations.of(context)!.genre_drama,
       'genre_thriller': (context) => AppLocalizations.of(context)!.genre_thriller,

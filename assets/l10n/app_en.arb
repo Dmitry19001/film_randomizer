@@ -33,6 +33,7 @@
 
 
     "genre_action": "Action",
+    "genre_adventure": "Adventure",
     "genre_comedy": "Comedy",
     "genre_drama": "Drama",
     "genre_thriller": "Thriller",
