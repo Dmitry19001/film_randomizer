@@ -58,8 +58,8 @@ class Film {
     );
   }
 
-  String toJson() {
-    final Map<String, dynamic> data = {
+  Map<String, dynamic> toJson() {
+    return {
       'title': title,
       'isWatched': isWatched,
       'genres': genres.map((genre) => genre.localizationId).toList(),
@@ -67,7 +67,5 @@ class Film {
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
-
-    return jsonEncode(data);
   }
 }
