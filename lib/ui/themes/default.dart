@@ -1,8 +1,8 @@
 import 'package:film_randomizer/ui/themes/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 
-class AppTheme {
-  static ThemeData get defaultTheme {
+class DefaultTheme {
+  static ThemeData get themeData {
     return ThemeData(
       brightness: Brightness.light,
       primaryColor: Colors.blue,

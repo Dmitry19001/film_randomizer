@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class DarkTheme {
   static ThemeData get themeData {
-    final defaultTextTheme = AppTheme.defaultTheme.textTheme;
+    final defaultTextTheme = DefaultTheme.themeData.textTheme;
 
     final darkTextTheme = defaultTextTheme.copyWith(
       displayLarge: defaultTextTheme.displayLarge?.copyWith(color: Colors.white70),
