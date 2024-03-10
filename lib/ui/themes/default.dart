@@ -1,3 +1,4 @@
+import 'package:film_randomizer/ui/themes/custom_theme_extension.dart';
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -36,6 +37,12 @@ class AppTheme {
           },
         ),
       ),
+      extensions: [
+        CustomThemeExtension(
+          chipColor: Colors.blue.withOpacity(0.5),
+          textStyle: TextStyle(color: Colors.white),
+        ),
+      ],
     );
   }
 }
