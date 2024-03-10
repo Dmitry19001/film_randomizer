@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:film_randomizer/models/genre.dart';
 import 'package:film_randomizer/models/category.dart';
 
