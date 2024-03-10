@@ -9,10 +9,10 @@ class GenreProvider with ChangeNotifier {
   Iterable<Genre>? get categories => _categories;
 
   GenreProvider() {
-    loadFilms();
+    loadGenres();
   }
 
-  Future<void> loadFilms() async {
+  Future<void> loadGenres() async {
     _categories = await _genreService.getGenres();
     notifyListeners();
   }

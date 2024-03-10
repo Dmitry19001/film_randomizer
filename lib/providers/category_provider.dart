@@ -9,10 +9,10 @@ class CategoryProvider with ChangeNotifier {
   Iterable<Category>? get categories => _categories;
 
   CategoryProvider() {
-    loadFilms();
+    loadCategories();
   }
 
-  Future<void> loadFilms() async {
+  Future<void> loadCategories() async {
     _categories = await _categoryService.getCategories();
     notifyListeners();
   }
