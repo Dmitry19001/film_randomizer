@@ -11,6 +11,7 @@
     "select_genres" : "Select Genres",
     "genres" : "Genres",
     "is_watched" : "Watched",
+    "submit" : "Submit",
 
     "settings_page" : "Settings",
     "edit_page" : "Edit film",

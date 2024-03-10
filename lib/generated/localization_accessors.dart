@@ -14,6 +14,7 @@ class L10nAccessor {
       'select_genres': (context) => AppLocalizations.of(context)!.select_genres,
       'genres': (context) => AppLocalizations.of(context)!.genres,
       'is_watched': (context) => AppLocalizations.of(context)!.is_watched,
+      'submit': (context) => AppLocalizations.of(context)!.submit,
       'settings_page': (context) => AppLocalizations.of(context)!.settings_page,
       'edit_page': (context) => AppLocalizations.of(context)!.edit_page,
       'add_page': (context) => AppLocalizations.of(context)!.add_page,
