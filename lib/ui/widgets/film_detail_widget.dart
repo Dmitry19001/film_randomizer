@@ -1,4 +1,5 @@
 import 'package:film_randomizer/generated/localization_accessors.dart';
+import 'package:film_randomizer/ui/screens/film_add_edit_page.dart';
 import 'package:flutter/material.dart';
 import 'package:film_randomizer/models/film.dart';
 
@@ -78,15 +79,15 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  "Overlay Controls",
-                  style: TextStyle(color: Colors.white, fontSize: 24),
-                ),
                 ElevatedButton(
-                  onPressed: () => setState(() => _isOverlayVisible = false),
-                  child: Text('Close'),
+                  onPressed: () => {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => FilmEditPage(film: widget.film,)),
+                    )
+                  },
+                  child: Text(L10nAccessor.get(context, "edit")),
                 ),
-                // Add more controls as needed
               ],
             ),
           ),
