@@ -1,27 +1,26 @@
 import 'dart:ui' as ui;
-import 'package:film_randomizer/ui/themes/dark.dart';
-import 'package:film_randomizer/ui/themes/default.dart';
 import 'package:flutter/material.dart';
-import 'package:logger/logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+enum AppTheme { light, dark }
 
 class SettingsProvider with ChangeNotifier {
   Locale _language;
   bool _showWatched;
-  ThemeData _themeData;
+  AppTheme _themeData;
 
   static const defaultLanguage = Locale('en');
   static const defaultShowWatched = true;
-  static final defaultTheme = DefaultTheme.themeData;
+  static final defaultTheme = AppTheme.light;
 
   SettingsProvider()
       : _language = defaultLanguage,
         _showWatched = defaultShowWatched,
-        _themeData = defaultTheme;
+        _themeData = AppTheme.light;
 
   Locale get language => _language;
   bool get showWatched => _showWatched;
-  ThemeData get theme => _themeData;
+  AppTheme get theme => _themeData;
 
   Future<void> loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
@@ -39,11 +38,11 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  ThemeData determineTheme(String? storedBrightness, ui.Brightness currentPlatformBrightness) {
+  AppTheme determineTheme(String? storedBrightness, ui.Brightness currentPlatformBrightness) {
     if (storedBrightness != null) {
-      return storedBrightness == 'dark' ? DarkTheme.themeData : defaultTheme;
+      return storedBrightness == 'dark' ? AppTheme.dark : defaultTheme;
     } else {
-      return currentPlatformBrightness == ui.Brightness.dark ? DarkTheme.themeData : defaultTheme;
+      return currentPlatformBrightness == ui.Brightness.dark ? AppTheme.dark : defaultTheme;
     }
   }
 
@@ -61,20 +60,18 @@ class SettingsProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> setTheme(ThemeData theme) async {
+  Future<void> setTheme(AppTheme theme) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('theme', theme == DarkTheme.themeData ? 'dark' : 'light');
+    await prefs.setString('theme', theme == AppTheme.dark ? 'dark' : 'default');
     _themeData = theme;
     notifyListeners();
   }
 
   void toggleTheme() {
     if (_themeData == defaultTheme) {
-      setTheme(DarkTheme.themeData);
-      Logger().d(DarkTheme.themeData);
+      setTheme(AppTheme.dark);
     } else {
       setTheme(defaultTheme);
-      Logger().d(defaultTheme);
     }
   }
 }

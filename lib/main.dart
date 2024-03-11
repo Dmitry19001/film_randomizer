@@ -3,6 +3,8 @@ import 'package:film_randomizer/providers/film_provider.dart';
 import 'package:film_randomizer/providers/genre_provider.dart';
 import 'package:film_randomizer/providers/settings_provider.dart';
 import 'package:film_randomizer/ui/screens/home_page.dart';
+import 'package:film_randomizer/ui/themes/dark.dart';
+import 'package:film_randomizer/ui/themes/default.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:logger/logger.dart';
@@ -38,7 +40,7 @@ class MyApp extends StatelessWidget {
           Logger().d("App title is: $title");
           return title;
         },
-        theme: settingsProvider.theme,
+        theme: settingsProvider.theme == AppTheme.dark? DarkTheme.themeData : DefaultTheme.themeData,
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         home: const MyHomePage(),

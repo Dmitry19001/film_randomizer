@@ -63,7 +63,7 @@ class SettingsScreen extends StatelessWidget {
     return ListTile(
       title: Text(L10nAccessor.get(context, 'theme')),
       trailing: Switch(
-        value: provider.theme == DarkTheme.themeData,
+        value: provider.theme == AppTheme.dark,
         onChanged: (bool newValue) {
           provider.toggleTheme(); 
         },
