@@ -12,8 +12,9 @@ class DefaultTheme {
 
       textTheme: const TextTheme(
         displayLarge: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-        titleLarge: TextStyle(fontSize: 16.0, fontStyle: FontStyle.italic),
+        titleLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
         bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
+        labelSmall: TextStyle(fontSize: 12.0, fontFamily: 'Hind', fontWeight: FontWeight.bold),
       ),
 
       buttonTheme: ButtonThemeData(
