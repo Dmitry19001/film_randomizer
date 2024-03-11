@@ -18,7 +18,8 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          _buildLanguageSelector(settingsProvider, context),
+          //_buildLanguageSelector(settingsProvider, context),
+          _buildLanguageDropDown(context, settingsProvider),
           _buildShowWatchedSwitcher(settingsProvider, context),
           _buildThemeSelector(settingsProvider, context),
           _buildVersionInfo(context),
@@ -34,6 +35,7 @@ class SettingsScreen extends StatelessWidget {
       title: Text(L10nAccessor.get(context, 'language')),
       trailing: DropdownButton<Locale>(
         value: provider.language,
+        style: Theme.of(context).textTheme.bodyMedium,
         onChanged: (Locale? newValue) {
           if (newValue != null) {
             provider.setLanguage(newValue);
@@ -45,6 +47,38 @@ class SettingsScreen extends StatelessWidget {
             child: Text(locale.toLanguageTag().toUpperCase()),
           );
         }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildLanguageDropDown(BuildContext context, SettingsProvider provider) {
+    const supportedLocales  = AppLocalizations.supportedLocales;
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: DropdownMenu<Locale>(
+        enableSearch: false,
+        // width: MediaQuery.of(context).size.width - 16,
+        expandedInsets: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+        requestFocusOnTap: false,
+        // leadingIcon: const Icon(Icons.language),
+        label: Text(L10nAccessor.get(context, 'language')),
+        textStyle: Theme.of(context).textTheme.bodyMedium,
+        initialSelection: provider.language,
+        inputDecorationTheme: const InputDecorationTheme(
+          filled: true,
+          contentPadding: EdgeInsets.symmetric(vertical: 5.0),
+        ),
+        onSelected: (Locale? locale) {
+          if (locale != null) {
+            provider.setLanguage(locale);
+          }
+        },
+        dropdownMenuEntries: supportedLocales.map<DropdownMenuEntry<Locale>>((Locale locale) {
+            return DropdownMenuEntry<Locale>(
+              value: locale,
+              label: locale.toLanguageTag().toUpperCase(),
+            );
+          }).toList(),
       ),
     );
   }
