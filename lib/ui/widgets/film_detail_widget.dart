@@ -21,9 +21,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onLongPress: () {
-        setState(() {
-          _isOverlayVisible = !_isOverlayVisible;
-        });
+        _toggleOverlay();
       },
       child: Card(
         margin: const EdgeInsets.all(8.0),
@@ -89,7 +87,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   Widget _buildOverlay(BuildContext context) {
     return Positioned.fill(
       child: GestureDetector(
-        onTap: () => setState(() => _isOverlayVisible = false),
+        onTap: () => _toggleOverlay(),
         child: Container(
           color: Colors.black54,
           child: Center(
@@ -101,7 +99,8 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => FilmEditPage(film: widget.film,)),
-                    )
+                    ),
+                    _toggleOverlay()
                   },
                   child: Text(L10nAccessor.get(context, "edit")),
                 ),
@@ -111,5 +110,11 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
         ),
       ),
     );
+  }
+  
+  void _toggleOverlay() {
+    setState(() {
+      _isOverlayVisible = !_isOverlayVisible;
+    });
   }
 }
