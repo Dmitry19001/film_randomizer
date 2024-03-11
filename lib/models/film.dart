@@ -47,7 +47,7 @@ class Film {
     return Film(
       id: json['_id'],
       title: json['title'],
-      isWatched: json['isWatched'] ?? false, // Corrected typo
+      isWatched: json['isWatched'] ?? false,
       genres: genres,
       categories: categories,
       addedBy: json['addedBy'],
@@ -65,5 +65,9 @@ class Film {
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
+  }
+
+  Film clone() {
+    return Film(id: id, title: title, isWatched: isWatched, genres: genres.toList(), categories: categories.toList());
   }
 }
