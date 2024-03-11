@@ -1,12 +1,13 @@
 import 'package:film_randomizer/providers/settings_provider.dart';
 import 'package:film_randomizer/generated/localization_accessors.dart';
-import 'package:film_randomizer/ui/themes/dark.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final settingsProvider = Provider.of<SettingsProvider>(context);
@@ -27,7 +28,6 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Widget _buildLanguageSelector(SettingsProvider provider, BuildContext context) {
-    // Replace with your language options
     const supportedLocales  = AppLocalizations.supportedLocales;
     
     return ListTile(
