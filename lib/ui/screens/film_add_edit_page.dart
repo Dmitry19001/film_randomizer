@@ -23,29 +23,31 @@ class FilmEditPage extends StatefulWidget {
 class _FilmEditPageState extends State<FilmEditPage> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  late Film _film;
+
+  @override
+  void initState() {
+    super.initState();
+    _film = widget.film.clone();
+    _loadInitialData();
+  }
+
+  void _loadInitialData() async {
+    await Provider.of<GenreProvider>(context, listen: false).loadGenres();
+    await Provider.of<CategoryProvider>(context, listen: false).loadCategories();
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    final pageTitle = L10nAccessor.get(context, widget.film.id != null? "edit_page" : "add_page");
+    final pageTitle = L10nAccessor.get(context, _film.id != null? "edit_page" : "add_page");
 
     return Scaffold(
       appBar: AppBar(
         title: Text(pageTitle),
       ),
-      body: FutureBuilder(
-        future: Future.wait([
-          Provider.of<GenreProvider>(context, listen: false).loadGenres(),
-          Provider.of<CategoryProvider>(context, listen: false).loadCategories(),
-        ]),
-        builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Error loading data'));
-          }
-          return _buildFilmForm();
-        },
-      ),
+      body:_buildFilmForm(),
     );
   }
 
@@ -67,11 +69,15 @@ class _FilmEditPageState extends State<FilmEditPage> {
 
   TextFormField _buildTitleField() {
     return TextFormField(
-      initialValue: widget.film.title,
+      initialValue: _film.title,
       decoration: InputDecoration(
         labelText: L10nAccessor.get(context, "title")
       ),
-      onSaved: (value) => widget.film.title = value ?? '',
+      onSaved: (value){
+        setState(() {
+          _film.title = value ?? '';
+        });
+      },
       validator: (value) => value == null || value.isEmpty ? 'Please enter a title' : null,
     );
 }
@@ -81,32 +87,42 @@ class _FilmEditPageState extends State<FilmEditPage> {
       title: Text(L10nAccessor.get(context, "is_watched")),
       enableFeedback: true,
       contentPadding: EdgeInsets.zero,
-      value: widget.film.isWatched,
+      value: _film.isWatched,
       onChanged: (bool value) {
-        setState(() => widget.film.isWatched = value);
+        setState(() => _film.isWatched = value);
       },
     );
   }
 
   Widget _buildGenreField() {
     final GenreProvider genreProvider = Provider.of<GenreProvider>(context, listen: false);
+    if (genreProvider.genres == null) return const Center(child: CircularProgressIndicator());
     return _buildMultiSelectField<Genre>(
       items: genreProvider.genres!.toList(),
       title: L10nAccessor.get(context, "genres"),
       buttonText: L10nAccessor.get(context, "select_genres"),
-      selectedItems: widget.film.genres,
-      onConfirm: (values) => widget.film.genres = values,
+      selectedItems: _film.genres,
+      onConfirm: (values) {
+        setState(() {
+          _film.genres = values;
+        });
+      }
     );
   }
 
   Widget _buildCategoryField() {
     final CategoryProvider categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+    if (categoryProvider.categories == null) return const Center(child: CircularProgressIndicator());
     return _buildMultiSelectField<Category>(
       items: categoryProvider.categories!.toList(),
       title: L10nAccessor.get(context, "categories"),
       buttonText: L10nAccessor.get(context, "select_categories"),
-      selectedItems: widget.film.categories,
-      onConfirm: (values) => widget.film.categories = values,
+      selectedItems: _film.categories,
+      onConfirm: (values) {
+        setState(() {
+          _film.categories = values;
+        });
+      }
     );
   }
 
@@ -170,11 +186,11 @@ class _FilmEditPageState extends State<FilmEditPage> {
       try {
         final filmProvider = Provider.of<FilmProvider>(context, listen: false);
 
-        if (widget.film.id == null) {
-          bool result = await filmProvider.createFilm(widget.film);
+        if (_film.id == null) {
+          bool result = await filmProvider.createFilm(_film);
           message = L10nAccessor.get(context, result? "film_created_successfully" : "film_created_error");
         } else {
-          bool result = await filmProvider.updateFilm(widget.film);
+          bool result = await filmProvider.updateFilm(_film);
           message = L10nAccessor.get(context, result? "film_updated_successfully" : "film_updated_error");
         }
       } catch (e) {
