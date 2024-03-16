@@ -15,7 +15,7 @@ import 'package:provider/provider.dart';
 class FilmEditPage extends StatefulWidget {
   final Film film;
   const FilmEditPage({super.key, required this.film});
-  final routeName = "/editFilm";
+  static String routeName = "/editFilm";
 
   @override
   State<FilmEditPage> createState() => _FilmEditPageState();

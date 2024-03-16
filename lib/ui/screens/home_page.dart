@@ -11,7 +11,7 @@ import 'package:film_randomizer/ui/widgets/film_detail_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-  final routeName = "/";
+  static String routeName = "/";
 
   @override
   State<HomePage> createState() => _HomePageState();

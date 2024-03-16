@@ -10,7 +10,7 @@ import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class RandomizeScreen extends StatefulWidget {
   const RandomizeScreen({super.key});
-  final routeName = "/randomizer";
+  static String routeName = "/randomizer";
 
   @override
   State<RandomizeScreen> createState() => _RandomizeScreenState();
