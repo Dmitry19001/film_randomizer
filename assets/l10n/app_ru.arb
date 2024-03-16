@@ -30,6 +30,8 @@
     "username": "Ник",
     "password": "Пароль",
 
+    "register_action": "Зарегистрироваться",
+    "login_action": "Войти",
     "goto_register": "Нет аккаунта? Создай",
     "goto_login": "Есть аккаунт? Перейди на вход",
 

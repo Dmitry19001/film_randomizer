@@ -30,6 +30,8 @@
     "username": "Username",
     "password": "Password",
 
+    "register_action": "Register",
+    "login_action": "Login",
     "goto_register": "Don\\u0027t have an account? Register",
     "goto_login": "Already have an account? Login",
 
