@@ -9,14 +9,15 @@ import 'package:film_randomizer/models/film.dart';
 import 'package:film_randomizer/providers/film_provider.dart'; 
 import 'package:film_randomizer/ui/widgets/film_detail_widget.dart'; 
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+  final routeName = "/";
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     // Accessing the FilmProvider
