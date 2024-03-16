@@ -7,6 +7,10 @@
     "error_occurred" : "Произошла ошибка!",
     "film_created_error" : "Произошла ошибка во время добавления фильма!",
     "film_updated_error" : "Произошла ошибка во время обновления фильма!",
+    "username_required" : "Ник обязателен!",
+    "password_required" : "Пароль обязателен!",
+    "username_short" : "Ник должен быт не короче 4 символов",
+    "password_short" : "Пароль должен быт не короче 4 символов",
 
     "film_created_successfully" : "Фильм создан успешно!",
     "film_updated_successfully" : "Фильм обновлен успешно!",
@@ -23,8 +27,14 @@
     "language": "Язык",
     "theme": "Оформление",
     "app_version": "Версия приложения",
+    "username": "Ник",
+    "password": "Пароль",
 
+    "goto_register": "Нет аккаунта? Создай",
+    "goto_login": "Есть аккаунт? Перейди на вход",
 
+    "login_page" : "Вход",
+    "register_page" : "Регистрация",
     "settings_page" : "Настройки",
     "edit_page" : "Редактирование фильма",
     "add_page" : "Добавление фильма",

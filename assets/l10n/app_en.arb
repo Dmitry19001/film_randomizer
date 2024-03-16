@@ -7,6 +7,10 @@
     "error_occurred" : "Error occured!",
     "film_created_error" : "Error occured during creation!",
     "film_updated_error" : "Error occured during update!",
+    "username_required" : "Username is required!",
+    "password_required" : "Password is required!",
+    "username_short" : "Username must be at least 4 characters long",
+    "password_short" : "Password must be at least 4 characters long",
 
     "film_created_successfully" : "Film created successfully!",
     "film_updated_successfully" : "Film updated successfully!",
@@ -23,7 +27,14 @@
     "language": "Language",
     "theme": "Theme",
     "app_version": "App version",
+    "username": "Username",
+    "password": "Password",
 
+    "goto_register": "Don\\u0027t have an account? Register",
+    "goto_login": "Already have an account? Login",
+
+    "login_page" : "Sign in",
+    "register_page" : "Sign up",
     "settings_page" : "Settings",
     "edit_page" : "Edit film",
     "add_page" : "Add new Film",
