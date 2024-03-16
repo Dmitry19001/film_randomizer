@@ -21,7 +21,6 @@ class CustomBottomNavigation extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.shuffle),
             onPressed: () {
-              // Navigate to the RandomizeScreen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => RandomizeScreen()),
