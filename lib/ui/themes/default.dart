@@ -6,6 +6,8 @@ class DefaultTheme {
     return ThemeData(
       brightness: Brightness.light,
       primaryColor: Colors.blue,
+      highlightColor: Colors.yellow,
+
       scaffoldBackgroundColor: Colors.white,
 
       fontFamily: 'Montserrat',
@@ -22,6 +24,11 @@ class DefaultTheme {
         buttonColor: Colors.blue,
         textTheme: ButtonTextTheme.primary,
       ), 
+
+      cardTheme: const CardTheme(
+        color: Color.fromARGB(106, 0, 195, 255)
+      ),
+
       colorScheme: ColorScheme.fromSwatch().copyWith(
         secondary: Colors.blueAccent
       ),
@@ -41,7 +48,7 @@ class DefaultTheme {
       extensions: [
         CustomThemeExtension(
           chipColor: Colors.blue.withOpacity(0.5),
-          textStyle: TextStyle(color: Colors.white),
+          textStyle: const TextStyle(color: Colors.white),
         ),
       ],
     );

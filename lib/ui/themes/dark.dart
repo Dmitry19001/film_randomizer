@@ -46,7 +46,7 @@ class DarkTheme {
       extensions: [
         CustomThemeExtension(
           chipColor: Colors.blue.withOpacity(0.5),
-          textStyle: TextStyle(color: Colors.white54),
+          textStyle: const TextStyle(color: Colors.white54),
         ),
       ],
     );
