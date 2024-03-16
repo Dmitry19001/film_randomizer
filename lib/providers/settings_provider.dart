@@ -74,4 +74,20 @@ class SettingsProvider with ChangeNotifier {
       setTheme(defaultTheme);
     }
   }
+
+  static Future<void> saveAuthData({String username = "", String token = ""}) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', username);
+    await prefs.setString('token', token);
+  }
+
+  static Future<Map<String, String?>> loadAuthData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString('username');
+    final token = prefs.getString('token');
+    return {
+      "username": username,
+      "token": token,
+    };
+  }
 }
