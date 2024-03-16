@@ -4,9 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class AuthService {
-}
-
-class CategoryService {
   final String _baseUrl = "$apiBaseUrl/";
   final Logger _logger = Logger();
 
