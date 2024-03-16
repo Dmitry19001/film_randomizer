@@ -13,8 +13,8 @@ import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FilmEditPage extends StatefulWidget {
-  final Film film;
-  const FilmEditPage({super.key, required this.film});
+  final Film? film;
+  const FilmEditPage({super.key, this.film});
   static String routeName = "/editFilm";
 
   @override
@@ -29,7 +29,7 @@ class _FilmEditPageState extends State<FilmEditPage> {
   @override
   void initState() {
     super.initState();
-    _film = widget.film.clone();
+    _film = widget.film != null? widget.film!.clone() : Film();
     _loadInitialData();
   }
 
