@@ -6,6 +6,7 @@ class DefaultTheme {
     return ThemeData(
       brightness: Brightness.light,
       primaryColor: Colors.blue,
+      hoverColor: Colors.blue,
       highlightColor: Colors.yellow,
 
       scaffoldBackgroundColor: Colors.white,

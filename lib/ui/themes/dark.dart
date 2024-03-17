@@ -9,16 +9,19 @@ class DarkTheme {
     final darkTextTheme = defaultTextTheme.copyWith(
       displayLarge: defaultTextTheme.displayLarge?.copyWith(color: Colors.white70),
       titleLarge: defaultTextTheme.titleLarge?.copyWith(color: Colors.white70),
-      bodyMedium: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white60),
+      bodyLarge: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white),
+      bodyMedium: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white),
+      bodySmall: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white),
       labelSmall: defaultTextTheme.labelSmall?.copyWith(color: Colors.white38)
     );
 
     return ThemeData(
       brightness: Brightness.dark,
       primaryColor: Colors.grey[800],
-      colorScheme: ColorScheme.dark(
-        primary: Colors.grey[900]!,
-        secondary: Colors.tealAccent[200]!,
+      hoverColor: Colors.deepPurpleAccent,
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.white,
+        secondary: Colors.deepPurpleAccent,
       ),
       fontFamily: 'Montserrat',
       textTheme: darkTextTheme,
@@ -54,6 +57,11 @@ class DarkTheme {
 
   static SwitchThemeData _buildSwitchThemeData() {
     return SwitchThemeData(
+      trackColor: MaterialStateProperty.resolveWith<Color>(
+        (Set<MaterialState> states) {
+          return Colors.transparent;
+        },
+      ),
       thumbColor: MaterialStateProperty.resolveWith<Color>(
         (Set<MaterialState> states) {
           if (states.contains(MaterialState.selected)) {
