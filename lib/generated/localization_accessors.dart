@@ -15,6 +15,7 @@ class L10nAccessor {
       'password_required': (context) => AppLocalizations.of(context)!.password_required,
       'username_short': (context) => AppLocalizations.of(context)!.username_short,
       'password_short': (context) => AppLocalizations.of(context)!.password_short,
+      'login_error': (context) => AppLocalizations.of(context)!.login_error,
       'film_created_successfully': (context) => AppLocalizations.of(context)!.film_created_successfully,
       'film_updated_successfully': (context) => AppLocalizations.of(context)!.film_updated_successfully,
       'title': (context) => AppLocalizations.of(context)!.title,

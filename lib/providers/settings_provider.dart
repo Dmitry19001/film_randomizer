@@ -11,7 +11,7 @@ class SettingsProvider with ChangeNotifier {
 
   static const defaultLanguage = Locale('en');
   static const defaultShowWatched = true;
-  static final defaultTheme = AppTheme.light;
+  static const defaultTheme = AppTheme.light;
 
   SettingsProvider()
       : _language = defaultLanguage,
