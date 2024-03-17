@@ -29,16 +29,34 @@ class AuthProvider with ChangeNotifier {
     return true;
   }
 
-  Future<bool> login(String login, String password) async {
+  Future<bool> login(String username, String password) async {
     Map<String, String> userData = {
-      'username': login,
-      'password':password
+      'username': username,
+      'password': password
     };
     _token = await _authService.login(userData);
 
     if (_token != null)
     {
-      SettingsProvider.saveAuthData(username: login, token: _token!);
+      SettingsProvider.saveAuthData(username: username, token: _token!);
+      notifyListeners();
+
+      return true;
+    }
+
+    return false;
+  }
+
+  Future<bool> register(String username, String password) async {
+    Map<String, String> userData = {
+      'username': username,
+      'password': password
+    };
+    _token = await _authService.register(userData);
+
+    if (_token != null)
+    {
+      SettingsProvider.saveAuthData(username: username, token: _token!);
       notifyListeners();
 
       return true;

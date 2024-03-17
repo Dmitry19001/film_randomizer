@@ -66,7 +66,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
             child: Text(
               L10nAccessor.get(context, _loginMode? "goto_register" : "goto_login"),
               style: TextStyle(
-                color: Theme.of(context).primaryColor,
+                color: Theme.of(context).hintColor,
                 decoration: TextDecoration.underline, 
               ),
             ),
@@ -83,10 +83,10 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
         labelText: L10nAccessor.get(context, "username"),
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: Theme.of(context).hintColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+          borderSide: BorderSide(color: Theme.of(context).hoverColor),
         ),
       ),
       controller: _usernameController,
@@ -108,10 +108,10 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
         labelText: L10nAccessor.get(context, "password"),
         border: const OutlineInputBorder(),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: Theme.of(context).hintColor),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).primaryColor),
+          borderSide: BorderSide(color: Theme.of(context).hoverColor),
         ),
       ),
       controller: _passwordController,
@@ -179,6 +179,21 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   }
 
   Future<void> _handleRegister(BuildContext context) async {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
 
+    final result = await authProvider.register(_usernameController.text, _passwordController.text);
+    _isLoading = false;
+
+    if (!result && mounted) {
+      Fluttertoast.showToast(msg: L10nAccessor.get(context, "ERROR"));
+      return;
+    }
+    
+    if (mounted) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    }
   }
 }
