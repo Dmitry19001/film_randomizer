@@ -8,7 +8,7 @@ class DarkTheme {
 
     final darkTextTheme = defaultTextTheme.copyWith(
       displayLarge: defaultTextTheme.displayLarge?.copyWith(color: Colors.white70),
-      titleLarge: defaultTextTheme.titleLarge?.copyWith(color: Colors.white70),
+      titleLarge: defaultTextTheme.titleLarge?.copyWith(color: Colors.white),
       bodyLarge: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white),
       bodyMedium: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white),
       bodySmall: defaultTextTheme.bodyMedium?.copyWith(color: Colors.white),
@@ -48,8 +48,8 @@ class DarkTheme {
       ),
       extensions: [
         CustomThemeExtension(
-          chipColor: Colors.blue.withOpacity(0.5),
-          textStyle: const TextStyle(color: Colors.white54),
+          chipColor: Colors.deepPurpleAccent,
+          textStyle: const TextStyle(color: Colors.white),
         ),
       ],
     );
