@@ -4,17 +4,17 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class AuthService {
-  final String _baseUrl = "$apiBaseUrl/";
   final Logger _logger = Logger();
 
   Future<String?> login(Map<String, String> userData) async {
     try {
       final response = await http.post(
-        Uri.parse("$_baseUrl/login"),
+        Uri.parse("$apiBaseUrl/login"),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
       );
       if (response.statusCode == 200) {
+        Logger().d(response.body);
         final data = jsonDecode(response.body);
         return data['token'];
       } else {
@@ -29,7 +29,7 @@ class AuthService {
   Future<String?> register(Map<String, String> userData) async {
     try {
       final response = await http.post(
-        Uri.parse("$_baseUrl/register"),
+        Uri.parse("$apiBaseUrl/register"),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
       );
