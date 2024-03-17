@@ -11,6 +11,7 @@
     "password_required" : "Password is required!",
     "username_short" : "Username must be at least 4 characters long",
     "password_short" : "Password must be at least 4 characters long",
+    "login_error" : "Unable to sign in, check username and password!",
 
     "film_created_successfully" : "Film created successfully!",
     "film_updated_successfully" : "Film updated successfully!",
@@ -32,7 +33,7 @@
 
     "register_action": "Register",
     "login_action": "Login",
-    "goto_register": "Don\\u0027t have an account? Register",
+    "goto_register": "Don't have an account? Register",
     "goto_login": "Already have an account? Login",
 
     "login_page" : "Sign in",

@@ -11,6 +11,7 @@
     "password_required" : "Пароль обязателен!",
     "username_short" : "Ник должен быт не короче 4 символов",
     "password_short" : "Пароль должен быт не короче 4 символов",
+    "login_error" : "Не удалось выполнить вход, проверь ник и пароль!",
 
     "film_created_successfully" : "Фильм создан успешно!",
     "film_updated_successfully" : "Фильм обновлен успешно!",
