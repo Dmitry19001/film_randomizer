@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
-  String? _username;
-  String? _token;
+  static String? _username;
+  static String? _token;
 
-  String? get username => _username;
-  String? get token => _token;
+  static String? get username => _username;
+  static String get token => _token ?? '';
 
   bool get isAuthenticated => _username != null && _token != null;
 
