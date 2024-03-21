@@ -2,7 +2,7 @@ import 'package:film_randomizer/providers/settings_provider.dart';
 import 'package:film_randomizer/generated/localization_accessors.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -20,35 +20,11 @@ class SettingsScreen extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          //_buildLanguageSelector(settingsProvider, context),
           _buildLanguageDropDown(context, settingsProvider),
           _buildShowWatchedSwitcher(settingsProvider, context),
           _buildThemeSelector(settingsProvider, context),
           _buildVersionInfo(context),
         ],
-      ),
-    );
-  }
-
-  Widget _buildLanguageSelector(SettingsProvider provider, BuildContext context) {
-    const supportedLocales  = AppLocalizations.supportedLocales;
-    
-    return ListTile(
-      title: Text(L10nAccessor.get(context, 'language')),
-      trailing: DropdownButton<Locale>(
-        value: provider.language,
-        style: Theme.of(context).textTheme.bodyMedium,
-        onChanged: (Locale? newValue) {
-          if (newValue != null) {
-            provider.setLanguage(newValue);
-          }
-        },
-        items: supportedLocales.map<DropdownMenuItem<Locale>>((Locale locale) {
-          return DropdownMenuItem<Locale>(
-            value: locale,
-            child: Text(locale.toLanguageTag().toUpperCase()),
-          );
-        }).toList(),
       ),
     );
   }
