@@ -46,6 +46,16 @@ class DarkTheme {
       cardTheme: CardTheme(
         color: Colors.deepPurple[800],
       ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.resolveWith((states) {
+            return Colors.white;
+          }),
+        )
+      ),
+
+
       extensions: [
         CustomThemeExtension(
           chipColor: Colors.deepPurpleAccent,

@@ -6,12 +6,9 @@ Future<bool> showDeleteConfirmationDialog(BuildContext context) async {
     context: context,
     builder: (context) => AlertDialog(
       title: Text(L10nAccessor.get(context, "confirmation")),
+      titleTextStyle: Theme.of(context).textTheme.titleLarge,
       content: Text(L10nAccessor.get(context, "delete_confirmation_title")),
       actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: Text(L10nAccessor.get(context, "cancel")),
-        ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: ButtonStyle(
@@ -20,6 +17,10 @@ Future<bool> showDeleteConfirmationDialog(BuildContext context) async {
             }),
           ),
           child: Text(L10nAccessor.get(context, "delete")),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(L10nAccessor.get(context, "cancel")),
         ),
       ],
     ),

@@ -46,6 +46,15 @@ class DefaultTheme {
           },
         ),
       ),
+
+      textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+          foregroundColor: MaterialStateProperty.resolveWith((states) {
+            return Colors.black;
+          }),
+        )
+      ),
+
       extensions: [
         CustomThemeExtension(
           chipColor: Colors.blue.withOpacity(0.5),
