@@ -102,7 +102,8 @@ class _FilmEditPageState extends State<FilmEditPage> {
       items: genreProvider.genres!.toList(),
       title: L10nAccessor.get(context, "genres"),
       buttonText: L10nAccessor.get(context, "select_genres"),
-      selectedItems: _film.genres,
+      buttonIconData: Icons.album,
+      selectedItems: _film.genres.toList(),
       onConfirm: (values) {
         setState(() {
           _film.genres = values;
@@ -118,7 +119,7 @@ class _FilmEditPageState extends State<FilmEditPage> {
       items: categoryProvider.categories!.toList(),
       title: L10nAccessor.get(context, "categories"),
       buttonText: L10nAccessor.get(context, "select_categories"),
-      selectedItems: _film.categories,
+      selectedItems: _film.categories.toList(),
       onConfirm: (values) {
         setState(() {
           _film.categories = values;
@@ -131,20 +132,27 @@ class _FilmEditPageState extends State<FilmEditPage> {
     required List<Localizable> items,
     required String title,
     required String buttonText,
-    required Set<Localizable> selectedItems,
+    required List<Localizable> selectedItems,
     required Function(Set<T>) onConfirm,
+    IconData buttonIconData = Icons.category,
   }) {
     final List<MultiSelectItem<Localizable>> multiSelectItems = items
         .map((item) => MultiSelectItem<Localizable>(item, item.localizedName(context)))
         .toList();
 
-
     return MultiSelectBottomSheetField(
       initialChildSize: 0.4,
       listType: MultiSelectListType.CHIP,
+      initialValue: selectedItems,
       searchable: true,
       buttonText: Text(buttonText),
-      title: Text(title),
+      buttonIcon: Icon(buttonIconData),
+      title: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Text(title),
+      ),
+      selectedColor: Theme.of(context).hoverColor,
+      selectedItemsTextStyle: Theme.of(context).customExtension.textStyle,
       itemsTextStyle: Theme.of(context).customExtension.textStyle,
       items: multiSelectItems,
       onConfirm: (values) {
@@ -201,7 +209,6 @@ class _FilmEditPageState extends State<FilmEditPage> {
 
       if (mounted) {
         if (success) {
-          // ignore: use_build_context_synchronously
           Navigator.of(context).pop();
         }
         Fluttertoast.showToast(msg: message);
