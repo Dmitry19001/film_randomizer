@@ -12,6 +12,18 @@ abstract class Localizable {
   }
 
   @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+  
+    return other is Localizable &&
+      other.id == id &&
+      other.localizationId == localizationId;
+  }
+
+  @override
+  int get hashCode => id.hashCode ^ localizationId.hashCode;
+
+  @override
   String toString() {
     return localizationId;
   }
