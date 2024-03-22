@@ -49,7 +49,7 @@ class FilmService {
     return null;
   }
 
-  Future<Film?> createFilm(Map<String, dynamic> filmData) async {
+  Future<Film?> postFilm(Map<String, dynamic> filmData) async {
     try {
       final response = await http.post(
         Uri.parse(_baseUrl),

@@ -18,7 +18,7 @@ class FilmProvider with ChangeNotifier {
   }
 
   Future<bool> createFilm(Film film) async {
-    Film?  createdFilm = await _filmService.createFilm(film.toJson());
+    Film?  createdFilm = await _filmService.postFilm(film.toJson());
 
     loadFilms();
     return createdFilm != null;
