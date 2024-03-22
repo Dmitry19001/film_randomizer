@@ -9,25 +9,42 @@ class CustomBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
+      height: 50,
+      notchMargin: 0,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.sync),
-            onPressed: () {
-              onSync?.call();
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.shuffle),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RandomizeScreen()),
-              );
-            },
-          ),
+          _buildSyncButton(context),
+          _buildRandomizeButton(context),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSyncButton(BuildContext context) {
+    return Expanded(
+      child: IconButton(
+        icon: const Icon(Icons.sync),
+        onPressed: () {
+          if (onSync != null) {
+            onSync!();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildRandomizeButton(BuildContext context) {
+    return Expanded(
+      child: IconButton(
+        icon: const Icon(Icons.shuffle),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const RandomizeScreen()),
+          );
+        },
       ),
     );
   }
