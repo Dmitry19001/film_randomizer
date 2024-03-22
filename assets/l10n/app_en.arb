@@ -7,6 +7,7 @@
     "error_occurred" : "Error occured!",
     "film_created_error" : "Error occured during creation!",
     "film_updated_error" : "Error occured during update!",
+    "film_delete_error" : "Error occured during deletion!",
     "username_required" : "Username is required!",
     "password_required" : "Password is required!",
     "username_short" : "Username must be at least 4 characters long",
@@ -15,7 +16,10 @@
 
     "film_created_successfully" : "Film created successfully!",
     "film_updated_successfully" : "Film updated successfully!",
+    "film_delete_success" : "Film deleted successfully!",
     
+    "delete_confirmation_title": "Are you sure?",
+
     "title" : "Title",
     "select_categories" : "Select Categories",
     "categories" : "Categories",
@@ -24,6 +28,10 @@
     "is_watched" : "Watched",
     "submit" : "Submit",
     "edit" : "Edit",
+    "delete" : "Delete",
+    "cancel" : "Cancel",
+    "register_action": "Register",
+    "login_action": "Login",
     "show_watched": "Show watched films",
     "language": "Language",
     "theme": "Theme",
@@ -31,8 +39,6 @@
     "username": "Username",
     "password": "Password",
 
-    "register_action": "Register",
-    "login_action": "Login",
     "goto_register": "Don't have an account? Register",
     "goto_login": "Already have an account? Login",
 
@@ -42,13 +48,13 @@
     "edit_page" : "Edit film",
     "add_page" : "Add new Film",
     "randomizer_page" : "Randomizer",
+    "confirmation" : "Confirmation",
 
     "category_series": "Series",
     "category_animation": "Animation",
     "category_cartoon": "Cartoon",
     "category_film": "Movie",
     "category_anime": "Anime",
-
 
     "genre_action": "Action",
     "genre_adventure": "Adventure",
