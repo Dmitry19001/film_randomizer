@@ -32,8 +32,9 @@ class FilmProvider with ChangeNotifier {
   }
 
   Future<bool> deleteFilm(Film film) async {
+    final result = await _filmService.deleteFilm(film.id!);
     loadFilms();
-    return await _filmService.deleteFilm(film.id!);
+    return result;
   }
 
   Future<void> filterWatched() async {
