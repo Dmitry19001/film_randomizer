@@ -77,7 +77,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
         height: 50,
         width: 50,
         decoration: BoxDecoration(
-          color: widget.film.isWatched? Colors.green : Colors.yellow,
+          color: widget.film.isWatched? Colors.green : Colors.redAccent,
           borderRadius: const BorderRadius.all(Radius.circular(25))
         ),
       ),
