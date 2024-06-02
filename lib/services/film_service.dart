@@ -62,7 +62,7 @@ class FilmService {
       if (response.statusCode == 201) {
         return Film.fromJson(json.decode(response.body));
       } else {
-        logger.e('Failed to create film: ${response.body}');
+        logger.e('Failed to post film: ${response.body}');
       }
     } catch (e) {
       logger.e('Error creating film: $e');
