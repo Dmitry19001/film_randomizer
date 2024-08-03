@@ -1,5 +1,6 @@
 import 'package:film_randomizer/providers/settings_provider.dart';
 import 'package:film_randomizer/ui/screens/film_add_edit_page.dart';
+import 'package:film_randomizer/ui/screens/randomizer_page.dart';
 import 'package:film_randomizer/ui/widgets/bottom_navigation_widget.dart';
 import 'package:film_randomizer/ui/widgets/main_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -57,6 +58,12 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: CustomBottomNavigation(
         onSync: () async => {_syncFilms()},
+        onOpenRandomizer: () async => {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => RandomizeScreen(films: _films)),
+          )
+        },
       ),
     );
   }

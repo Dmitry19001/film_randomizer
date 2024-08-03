@@ -19,6 +19,7 @@ class DarkTheme {
       brightness: Brightness.dark,
       primaryColor: Colors.grey[800],
       hoverColor: Colors.deepPurpleAccent,
+      highlightColor: Colors.yellow,
       colorScheme: const ColorScheme.dark(
         primary: Colors.white,
         secondary: Colors.deepPurpleAccent,

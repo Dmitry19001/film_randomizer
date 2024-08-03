@@ -1,10 +1,10 @@
-import 'package:film_randomizer/ui/screens/randomizer_page.dart';
 import 'package:flutter/material.dart';
 
 class CustomBottomNavigation extends StatelessWidget {
   final VoidCallback? onSync;
+  final VoidCallback? onOpenRandomizer;
 
-  const CustomBottomNavigation({super.key, this.onSync});
+  const CustomBottomNavigation({super.key, this.onSync, this.onOpenRandomizer});
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +40,9 @@ class CustomBottomNavigation extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.shuffle),
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const RandomizeScreen()),
-          );
+          if (onOpenRandomizer != null) {
+            onOpenRandomizer!();
+          }
         },
       ),
     );

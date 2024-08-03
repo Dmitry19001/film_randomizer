@@ -9,7 +9,10 @@ import 'package:film_randomizer/generated/localization_accessors.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class RandomizeScreen extends StatefulWidget {
-  const RandomizeScreen({super.key});
+  final Iterable<Film>? films;
+
+  const RandomizeScreen({super.key, this.films});
+
   static String routeName = "/randomizer";
 
   @override
@@ -21,20 +24,22 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
   final ScrollOffsetController scrollOffsetController = ScrollOffsetController();
   final ItemPositionsListener itemPositionsListener = ItemPositionsListener.create();
   final ScrollOffsetListener scrollOffsetListener = ScrollOffsetListener.create();
-  List films = [];
-  
+  Iterable<Film> _films = [];
   int? selectedFilmIndex;
 
   @override
   void initState() {
     super.initState();
+    
+    setState(() {
+      _films = widget.films ?? [];
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final filmProvider = Provider.of<FilmProvider>(context);
-    if (filmProvider.films == null || filmProvider.films!.length < 2){
-      Fluttertoast.showToast(msg:"Add films first!");
+    if (widget.films == null || widget.films!.isEmpty) {
+      Fluttertoast.showToast(msg: "Add films first!");
       Navigator.of(context).pop();
     }
 
@@ -44,37 +49,36 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
       ),
       body: Column(
         children: [
-          _buildControls(context, filmProvider),
+          _buildControls(),
           Expanded(
             flex: 5,
-            child: _buildFilmRandomList(context, filmProvider),
+            child: _buildFilmRandomList(),
           ),
         ],
       ),
-      floatingActionButton: _buildRandomizeButton(context, filmProvider),
+      floatingActionButton: _buildRandomizeButton(),
     );
   }
 
-  Widget _buildControls(BuildContext context, FilmProvider filmProvider) {
+  Widget _buildControls() {
     return Container();
   }
 
-  Widget _buildFilmRandomList(BuildContext context, FilmProvider filmProvider) {
+  Widget _buildFilmRandomList() {
     return Stack(
       children: [
         ScrollablePositionedList.builder(
-          itemCount: films.length + 1,
+          itemCount: _films.length + 1,
           itemScrollController: itemScrollController,
           scrollOffsetController: scrollOffsetController,
           itemPositionsListener: itemPositionsListener,
           scrollOffsetListener: scrollOffsetListener,
           physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {
-            if (index < films.length) {
-              Film film = films.elementAt(index);
-              return _buildFilmListEntry(index, context, film);
-            }
-            else {
+            if (index < _films.length) {
+              Film film = _films.elementAt(index);
+              return _buildFilmListEntry(index, film);
+            } else {
               return SizedBox(
                 height: MediaQuery.of(context).size.height,
               );
@@ -86,26 +90,34 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
     );
   }
 
-  Container _buildFilmListEntry(int index, BuildContext context, Film film) {
+  Container _buildFilmListEntry(int index, Film film) {
     bool isSelected = index == selectedFilmIndex;
     return Container(
       padding: const EdgeInsets.all(8.0),
-      decoration: isSelected ? BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).highlightColor.withOpacity(0.5),
-            spreadRadius: 4,
-            blurRadius: 20,
-            offset: const Offset(0, 0),
-          ),
-        ],
-      ) : null,
-      child: Text(film.title!, textAlign: TextAlign.center, style: TextStyle(color: isSelected ? Theme.of(context).primaryColor : null),),
+      decoration: isSelected
+          ? BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Theme.of(context).highlightColor.withOpacity(0.75),
+                  spreadRadius: 4,
+                  blurRadius: 20,
+                  offset: const Offset(0, 0),
+                ),
+              ],
+            )
+          : null,
+      child: Text(
+        film.title!,
+        textAlign: TextAlign.center,
+        // style: TextStyle(
+        //   color: isSelected ? Theme.of(context).primaryColor : null,
+        // ),
+      ),
     );
   }
 
   Widget _buildOverlay(BuildContext context) {
-    return  Column(
+    return Column(
       children: [
         SizedBox(
           height: 100,
@@ -125,7 +137,7 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
           ),
         ),
         Expanded(
-          child: Container (
+          child: Container(
             color: Theme.of(context).primaryColor,
           ),
         ),
@@ -133,21 +145,19 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
     );
   }
 
-  Widget _buildRandomizeButton(BuildContext context, FilmProvider provider) {
+  Widget _buildRandomizeButton() {
     return FloatingActionButton(
       child: const Icon(Icons.shuffle),
-      onPressed:() {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _handleRandomize(provider);
-        });
+      onPressed: () {
+        _handleRandomize();
       },
     );
   }
 
-  void _handleRandomize(FilmProvider provider) async {
+  void _handleRandomize() {
     setState(() {
-      films = randomizeSize(provider.films!.toList());
-      selectedFilmIndex = Random().nextInt(films.length - 1);
+      _films = randomizeSize(_films);
+      selectedFilmIndex = Random().nextInt(_films.length);
     });
     if (selectedFilmIndex != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

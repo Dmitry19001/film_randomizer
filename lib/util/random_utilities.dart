@@ -1,14 +1,19 @@
-import 'dart:math';
+import 'package:film_randomizer/models/film.dart';
 
-List randomizeSize(List items) {
-  Random random = Random();
-  final List result = []; 
+Iterable<Film> randomizeSize(Iterable<Film> items, {int minCount = 50}) {
+  final List<Film> result = [];
+  final List<Film> itemsList = items.toList();
 
-  int multiply = random.nextInt(10);
+  // Ensure the list is shuffled at least once
+  itemsList.shuffle();
+  result.addAll(itemsList);
 
-  for (int x = 0; x < multiply; x++) {
-    items.shuffle();
-    result.addAll(items);
+  // Calculate how many times we need to repeat the list to reach minCount
+  int multiply = (minCount / itemsList.length).ceil();
+
+  for (int x = 1; x < multiply; x++) {
+    itemsList.shuffle();
+    result.addAll(itemsList);
   }
 
   return result;
