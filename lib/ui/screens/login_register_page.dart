@@ -163,14 +163,16 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
 
     final result = await authProvider.login(_usernameController.text, _passwordController.text);
 
-    _isLoading = false;
+    setState(() {
+      _isLoading = false;
+    });
     
-    if (!result && mounted) {
+    if (!result && context.mounted) {
       Fluttertoast.showToast(msg: L10nAccessor.get(context, "login_error"));
       return;
     }
     
-    if (mounted) {
+    if (context.mounted) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),

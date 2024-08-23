@@ -13,9 +13,9 @@ class AuthService {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
       );
-      if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      if (data['token'] != null) {
         Logger().d(response.body);
-        final data = jsonDecode(response.body);
         return data['token'];
       } else {
         _logger.e('Failed to login: ${response.body}');

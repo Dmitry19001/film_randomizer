@@ -343,15 +343,18 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
   void _showFilmDetails() {
     showGeneralDialog(
       context: context,
+
       pageBuilder: (context, animation, secondaryAnimation) {
         return Container();
       },
       transitionBuilder: (context, animation, secondaryAnimation, child){
         return ScaleTransition(
           scale: Tween<double>(begin: 0.1, end: 1.0).animate(animation),
-          child: FilmDetailWidget(
-            film: _filteredFilms.elementAt(_selectedFilmIndex!),
-            showAdditionalControls: true
+          child: SafeArea(
+            child: FilmDetailWidget(
+              film: _filteredFilms.elementAt(_selectedFilmIndex!),
+              showAdditionalControls: true
+            ),
           ),
         );
       },
