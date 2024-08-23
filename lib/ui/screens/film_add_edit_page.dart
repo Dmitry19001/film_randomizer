@@ -1,15 +1,13 @@
 import 'package:film_randomizer/generated/localization_accessors.dart';
-import 'package:film_randomizer/models/base/localizable.dart';
 import 'package:film_randomizer/models/category.dart';
 import 'package:film_randomizer/models/film.dart';
 import 'package:film_randomizer/models/genre.dart';
 import 'package:film_randomizer/providers/category_provider.dart';
 import 'package:film_randomizer/providers/film_provider.dart';
 import 'package:film_randomizer/providers/genre_provider.dart';
-import 'package:film_randomizer/ui/themes/custom_theme_extension.dart';
+import 'package:film_randomizer/ui/widgets/multi_select_field.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FilmEditPage extends StatefulWidget {
@@ -100,9 +98,10 @@ class _FilmEditPageState extends State<FilmEditPage> {
 
   Widget _buildGenreField() {
     final GenreProvider genreProvider = Provider.of<GenreProvider>(context, listen: false);
-    if (genreProvider.genres == null) return const Center(child: CircularProgressIndicator());
-    return _buildMultiSelectField<Genre>(
-      items: genreProvider.genres!.toList(),
+    if (genreProvider.genres.isEmpty) return const Center(child: CircularProgressIndicator());
+    return MultiSelectField<Genre>(
+      context: context,
+      items: genreProvider.genres.toList(),
       title: L10nAccessor.get(context, "genres"),
       buttonText: L10nAccessor.get(context, "select_genres"),
       buttonIconData: Icons.album,
@@ -111,67 +110,38 @@ class _FilmEditPageState extends State<FilmEditPage> {
         setState(() {
           _film.genres = values;
         });
-      }
+      },
+      onChipTap: (item) {
+        setState(() {
+          if (item != null) _film.genres.remove(item);
+        });
+      },
     );
   }
 
   Widget _buildCategoryField() {
     final CategoryProvider categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
-    if (categoryProvider.categories == null) return const Center(child: CircularProgressIndicator());
-    return _buildMultiSelectField<Category>(
-      items: categoryProvider.categories!.toList(),
+    if (categoryProvider.categories.isEmpty) return const Center(child: CircularProgressIndicator());
+    return MultiSelectField<Category>(
+      context: context,
+      items: categoryProvider.categories.toList(),
       title: L10nAccessor.get(context, "categories"),
       buttonText: L10nAccessor.get(context, "select_categories"),
+      buttonIconData: Icons.category,
       selectedItems: _film.categories.toList(),
       onConfirm: (values) {
         setState(() {
           _film.categories = values;
         });
-      }
-    );
-  }
-
-  Widget _buildMultiSelectField<T>({
-    required List<Localizable> items,
-    required String title,
-    required String buttonText,
-    required List<Localizable> selectedItems,
-    required Function(Set<T>) onConfirm,
-    IconData buttonIconData = Icons.category,
-  }) {
-    final List<MultiSelectItem<Localizable>> multiSelectItems = items
-        .map((item) => MultiSelectItem<Localizable>(item, item.localizedName(context)))
-        .toList();
-
-    return MultiSelectBottomSheetField(
-      initialChildSize: 0.4,
-      listType: MultiSelectListType.CHIP,
-      initialValue: selectedItems,
-      searchable: true,
-      buttonText: Text(buttonText),
-      buttonIcon: Icon(buttonIconData),
-      title: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: Text(title),
-      ),
-      selectedColor: Theme.of(context).hoverColor,
-      selectedItemsTextStyle: Theme.of(context).customExtension.textStyle,
-      itemsTextStyle: Theme.of(context).customExtension.textStyle,
-      items: multiSelectItems,
-      onConfirm: (values) {
-        onConfirm(Set.from(values.cast<T>()));
       },
-      chipDisplay: MultiSelectChipDisplay(
-        chipColor: Theme.of(context).customExtension.chipColor,
-        textStyle: Theme.of(context).customExtension.textStyle,
-        onTap: (item) {
-          setState(() {
-             if (item != null) selectedItems.remove(item);
-          });
-        },
-      ),
+      onChipTap: (item) {
+        setState(() {
+          if (item != null) _film.categories.remove(item);
+        });
+      },
     );
   }
+
 
   ElevatedButton _buildSubmitButton() {
     return ElevatedButton(
