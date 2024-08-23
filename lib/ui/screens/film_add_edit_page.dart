@@ -34,8 +34,11 @@ class _FilmEditPageState extends State<FilmEditPage> {
   }
 
   void _loadInitialData() async {
-    await Provider.of<GenreProvider>(context, listen: false).loadGenres();
-    await Provider.of<CategoryProvider>(context, listen: false).loadCategories();
+    final genreProvider = Provider.of<GenreProvider>(context, listen: false);
+    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+
+    await genreProvider.loadGenres();
+    await categoryProvider.loadCategories();
 
     setState(() {});
   }
@@ -197,9 +200,15 @@ class _FilmEditPageState extends State<FilmEditPage> {
 
         if (_film.id == null) {
           bool result = await filmProvider.createFilm(_film);
+
+          if (!context.mounted) return;
+
           message = L10nAccessor.get(context, result? "film_created_successfully" : "film_created_error");
         } else {
           bool result = await filmProvider.updateFilm(_film);
+
+          if (!context.mounted) return;
+
           message = L10nAccessor.get(context, result? "film_updated_successfully" : "film_updated_error");
         }
       } catch (e) {
