@@ -4,16 +4,22 @@ import 'package:flutter/material.dart';
 
 class GenreProvider with ChangeNotifier {
   final GenreService _genreService = GenreService();
-  List<Genre>? _genres;
+  final List<Genre> _genres = [];
 
-  Iterable<Genre>? get genres => _genres;
+  Iterable<Genre> get genres => _genres;
 
   GenreProvider() {
     loadGenres();
   }
 
   Future<void> loadGenres() async {
-    _genres = await _genreService.getGenres();
+    final fetchedGenres = await _genreService.getGenres();
+
+    if (fetchedGenres == null) return;
+    
+    _genres.clear();
+    _genres.addAll(fetchedGenres);
+
     notifyListeners();
   }
 }
