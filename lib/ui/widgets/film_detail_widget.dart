@@ -10,8 +10,13 @@ import 'package:provider/provider.dart';
 
 class FilmDetailWidget extends StatefulWidget {
   final Film film;
+  final bool showAdditionalControls;
 
-  const FilmDetailWidget({super.key, required this.film});
+  const FilmDetailWidget({
+    super.key,
+    required this.film,
+    this.showAdditionalControls = false
+  });
 
   @override
   State<FilmDetailWidget> createState() => _FilmDetailWidgetState();
@@ -46,28 +51,37 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
+        // mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            widget.film.title ?? L10nAccessor.get(context, "missing_title"),
-            style: Theme.of(context).textTheme.titleLarge,
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.film.title ?? L10nAccessor.get(context, "missing_title"),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                "${L10nAccessor.get(context, "genres")}: ${widget.film.genres.map((genre) => genre.localizedName(context)).join(', ')}",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                "${L10nAccessor.get(context, "categories")}: ${widget.film.categories.map((category) => category.localizedName(context)).join(', ')}",
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 8.0),
+              Text(
+                "${widget.film.addedBy}",
+                style: Theme.of(context).textTheme.labelSmall,
+                textAlign: TextAlign.end,
+              ),
+            ],
           ),
-          const SizedBox(height: 8.0),
-          Text(
-            "${L10nAccessor.get(context, "genres")}: ${widget.film.genres.map((genre) => genre.localizedName(context)).join(', ')}",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            "${L10nAccessor.get(context, "categories")}: ${widget.film.categories.map((category) => category.localizedName(context)).join(', ')}",
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 8.0),
-          Text(
-            "${widget.film.addedBy}",
-            style: Theme.of(context).textTheme.labelSmall,
-            textAlign: TextAlign.end,
-          ),
+          if (widget.showAdditionalControls) _buildAdditionalControls(context),
         ],
       ),
     );
@@ -126,7 +140,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   IconButton _buildDeleteButton(BuildContext context) {
     return IconButton(
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith((states) {
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
           return Colors.red;
         }),
       ),
@@ -139,24 +153,83 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   }
 
   Future<void> _handleDelete(BuildContext context) async {
+    final FilmProvider filmProvider = Provider.of<FilmProvider>(context, listen: false);
+
     _toggleOverlay();
     
     final bool confirmDelete = await showDeleteConfirmationDialog(context);
     
-    if (!confirmDelete) return;
+    if (!confirmDelete || !context.mounted) return;
 
-    final result = await Provider.of<FilmProvider>(context, listen: false).deleteFilm(widget.film);
+    final result = await filmProvider.deleteFilm(widget.film);
     
-    if (!mounted) return;
+    if (!context.mounted) return;
 
     final message = L10nAccessor.get(context, result ? "film_delete_success" : "film_delete_error");
 
     Fluttertoast.showToast(msg: message);
   }
 
+  Widget _buildAdditionalControls(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Wrap(
+          // mainAxisAlignment: MainAxisAlignment.center,
+          alignment: WrapAlignment.spaceBetween,
+          runAlignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            if(!widget.film.isWatched) _buildMarkAsWatchedButton(),
+            _buildOkButton(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMarkAsWatchedButton() {
+    return ElevatedButton(
+      onPressed: () async {
+        setState(() {
+          widget.film.isWatched = !widget.film.isWatched;
+        });
+
+        await _handleSave(context);
+      },
+      child: Text(L10nAccessor.get(context, "is_watched")),
+    );
+  }
+
+  Widget _buildOkButton() {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+      child: Text(L10nAccessor.get(context, "ok")),
+    );
+  }
+
   void _toggleOverlay() {
+    if (widget.showAdditionalControls) return;
+    
     setState(() {
       _isOverlayVisible = !_isOverlayVisible;
     });
+  }
+
+  Future<void> _handleSave(BuildContext context) async {
+    final filmProvider = Provider.of<FilmProvider>(context, listen: false);
+
+    await filmProvider.updateFilm(widget.film);
+
+    if (!context.mounted) return;
+
+    final message = L10nAccessor.get(context, "film_marked_as_watched");
+
+    Fluttertoast.showToast(msg: message);
+
+    Navigator.of(context).pop();
   }
 }
