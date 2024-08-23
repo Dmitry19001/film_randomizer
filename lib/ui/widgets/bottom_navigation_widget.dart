@@ -27,9 +27,8 @@ class CustomBottomNavigation extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.sync),
         onPressed: () {
-          if (onSync != null) {
-            onSync!();
-          }
+          if (onSync == null) return;
+          onSync!();
         },
       ),
     );
@@ -40,9 +39,8 @@ class CustomBottomNavigation extends StatelessWidget {
       child: IconButton(
         icon: const Icon(Icons.shuffle),
         onPressed: () {
-          if (onOpenRandomizer != null) {
-            onOpenRandomizer!();
-          }
+          if (onOpenRandomizer == null) return;
+          onOpenRandomizer!();
         },
       ),
     );
