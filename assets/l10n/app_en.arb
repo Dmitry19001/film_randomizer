@@ -13,10 +13,12 @@
     "username_short" : "Username must be at least 4 characters long",
     "password_short" : "Password must be at least 4 characters long",
     "login_error" : "Unable to sign in, check username and password!",
+    "films_missing" : "Films missing! Add some to get started.",
 
     "film_created_successfully" : "Film created successfully!",
     "film_updated_successfully" : "Film updated successfully!",
     "film_delete_success" : "Film deleted successfully!",
+    "film_marked_as_watched" : "Film marked as watched!",
     
     "delete_confirmation_title": "Are you sure?",
 
@@ -30,6 +32,7 @@
     "edit" : "Edit",
     "delete" : "Delete",
     "cancel" : "Cancel",
+    "ok" : "Ok",
     "register_action": "Register",
     "login_action": "Login",
     "show_watched": "Show watched films",
@@ -38,6 +41,8 @@
     "app_version": "App version",
     "username": "Username",
     "password": "Password",
+    "include_watched" : "Include watched films",
+    "switch_include_mode" : "Switch include/exclude mode",
 
     "goto_register": "Don't have an account? Register",
     "goto_login": "Already have an account? Login",
