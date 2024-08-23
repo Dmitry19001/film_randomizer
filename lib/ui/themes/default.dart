@@ -35,11 +35,11 @@ class DefaultTheme {
       ),
 
       switchTheme: SwitchThemeData(
-        thumbColor: MaterialStateProperty.all<Color>(Colors.blue),
-        trackOutlineColor: MaterialStateProperty.all<Color>(Colors.blue),
-        trackColor: MaterialStateProperty.resolveWith<Color>(
-          (Set<MaterialState> states) {
-            if (states.contains(MaterialState.selected)) {
+        thumbColor: WidgetStateProperty.all<Color>(Colors.blue),
+        trackOutlineColor: WidgetStateProperty.all<Color>(Colors.blue),
+        trackColor: WidgetStateProperty.resolveWith<Color>(
+          (Set<WidgetState> states) {
+            if (states.contains(WidgetState.selected)) {
               return Colors.blue.withOpacity(0.5); // Light blue for active state
             }
             return Colors.white; // Default color for inactive state
@@ -49,7 +49,7 @@ class DefaultTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: MaterialStateProperty.resolveWith((states) {
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
             return Colors.black;
           }),
         )

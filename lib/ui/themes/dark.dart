@@ -50,7 +50,7 @@ class DarkTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: ButtonStyle(
-          foregroundColor: MaterialStateProperty.resolveWith((states) {
+          foregroundColor: WidgetStateProperty.resolveWith((states) {
             return Colors.white;
           }),
         )
@@ -68,22 +68,22 @@ class DarkTheme {
 
   static SwitchThemeData _buildSwitchThemeData() {
     return SwitchThemeData(
-      trackColor: MaterialStateProperty.resolveWith<Color>(
-        (Set<MaterialState> states) {
+      trackColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
           return Colors.transparent;
         },
       ),
-      thumbColor: MaterialStateProperty.resolveWith<Color>(
-        (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+      thumbColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return Colors.deepPurpleAccent;
           }
           return Colors.white;
         },
       ),
-      trackOutlineColor: MaterialStateProperty.resolveWith<Color>(
-        (Set<MaterialState> states) {
-          if (states.contains(MaterialState.selected)) {
+      trackOutlineColor: WidgetStateProperty.resolveWith<Color>(
+        (Set<WidgetState> states) {
+          if (states.contains(WidgetState.selected)) {
             return Colors.deepPurpleAccent;
           }
           return Colors.white;
