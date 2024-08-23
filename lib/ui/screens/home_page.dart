@@ -56,9 +56,12 @@ class _HomePageState extends State<HomePage> {
           )
         },
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: CustomBottomNavigation(
-        onSync: () async => {_syncFilms()},
-        onOpenRandomizer: () async => {
+        onSync: () async => {
+          _syncFilms()
+        },
+        onOpenRandomizer: () => {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => RandomizeScreen(films: _films)),
