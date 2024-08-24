@@ -39,7 +39,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
           clipBehavior: Clip.none,
           children: [
             _buildWatchedIndicator(),
-            _buildCardContent(context),
+            _buildCardLayout(context),
             if (_isOverlayVisible) _buildOverlay(context),
           ]
         )
@@ -47,42 +47,85 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
     );
   }
 
+  Widget _buildCardLayout(BuildContext context) {
+    return Row(
+      children: [
+        if (widget.film.imageUrl.isNotEmpty) _buildImage(context),
+        _buildCardContent(context),
+      ],
+    );
+  }
+
+  Widget _buildImage(BuildContext context) {
+    return Expanded(
+      flex: 3,
+      child: Image.network(
+        widget.film.imageUrl,
+      ),
+    );
+  }
+
   Widget _buildCardContent(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        // mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.film.title ?? L10nAccessor.get(context, "missing_title"),
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                "${L10nAccessor.get(context, "genres")}: ${widget.film.genres.map((genre) => genre.localizedName(context)).join(', ')}",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                "${L10nAccessor.get(context, "categories")}: ${widget.film.categories.map((category) => category.localizedName(context)).join(', ')}",
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 8.0),
-              Text(
-                "${widget.film.addedBy}",
-                style: Theme.of(context).textTheme.labelSmall,
-                textAlign: TextAlign.end,
-              ),
-            ],
-          ),
-          if (widget.showAdditionalControls) _buildAdditionalControls(context),
-        ],
+    return Expanded(
+      flex: 7,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          // mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.film.title ?? L10nAccessor.get(context, "missing_title"),
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.album,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Flexible(
+                      child: Text(
+                        widget.film.genres.map((genre) => genre.localizedName(context)).join(', '),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8.0),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.category,
+                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                    ),
+                    const SizedBox(width: 8.0),
+                    Flexible(
+                      child: Text(
+                        widget.film.categories.map((category) => category.localizedName(context)).join(', '),
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  "${widget.film.addedBy}",
+                  style: Theme.of(context).textTheme.labelSmall,
+                  textAlign: TextAlign.end,
+                ),
+              ],
+            ),
+            if (widget.showAdditionalControls) _buildAdditionalControls(context),
+          ],
+        ),
       ),
     );
   }
@@ -123,8 +166,13 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
     );
   }
 
-  ElevatedButton _buildEditButton(BuildContext context) {
-    return ElevatedButton.icon(
+  IconButton _buildEditButton(BuildContext context) {
+    return IconButton(
+      style: ButtonStyle(
+        backgroundColor: WidgetStateProperty.resolveWith((states) {
+          return Theme.of(context).primaryColor;
+        }),
+      ),
       onPressed: () => {
         Navigator.push(
           context,
@@ -133,7 +181,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
         _toggleOverlay()
       },
       icon: const Icon(Icons.edit_document),
-      label: Text(L10nAccessor.get(context, "edit")),
+      tooltip: L10nAccessor.get(context, "edit"),
     );
   }
 
