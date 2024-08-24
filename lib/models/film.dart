@@ -8,6 +8,7 @@ class Film {
   Set<Genre> genres;
   Set<Category> categories;
   String? addedBy;
+  String imageUrl;
   DateTime? createdAt;
   DateTime? updatedAt;
 
@@ -18,6 +19,7 @@ class Film {
     List<Genre>? genres,
     List<Category>? categories,
     this.addedBy,
+    this.imageUrl = "",
     this.createdAt,
     this.updatedAt,
   })  : genres = genres?.toSet() ?? {},
@@ -51,6 +53,7 @@ class Film {
       genres: genres,
       categories: categories,
       addedBy: json['addedBy'],
+      imageUrl: json['imageUrl'] ?? "",
       createdAt: DateTime.parse(json['createdAt']),
       updatedAt: DateTime.parse(json['updatedAt']),
     );
@@ -62,12 +65,23 @@ class Film {
       'isWatched': isWatched,
       'genres': genres.map((genre) => genre.localizationId).toList(),
       'categories': categories.map((category) => category.localizationId).toList(),
+      'imageUrl': imageUrl,
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
   Film clone() {
-    return Film(id: id, title: title, isWatched: isWatched, genres: genres.toList(), categories: categories.toList());
+    return Film(
+      id: id,
+      title: title,
+      isWatched: isWatched,
+      genres: genres.toList(),
+      categories: categories.toList(),
+      imageUrl: imageUrl,
+      addedBy: addedBy,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
   }
 }
