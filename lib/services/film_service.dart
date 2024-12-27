@@ -1,25 +1,42 @@
 import 'dart:convert';
-import 'package:film_randomizer/config/config.dart';
-import 'package:film_randomizer/providers/auth_provider.dart';
+import 'package:film_randomizer/util/safe_request.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
-import 'package:film_randomizer/models/film.dart'; 
+
+import 'package:film_randomizer/models/film.dart';
 
 class FilmService {
-  final String _baseUrl = "$apiBaseUrl/films";
+  final String baseUrl;
+  final String token;
+  final Ref ref;
+
+  FilmService({
+    required this.baseUrl,
+    required this.token,
+    required this.ref,
+  });
+
   final logger = Logger();
 
   Future<List<Film>?> getFilms() async {
     try {
-      final response = await http.get(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Authorization': 'Bearer ${AuthProvider.token}',
-        },
+      logger.d('Fetching films from $baseUrl/films');
+      logger.d('Authorization: Bearer $token');
+
+      final response = await safeRequest(
+        () => http.get(
+          Uri.parse("$baseUrl/films"),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        ref
       );
+
       if (response.statusCode == 200) {
-        Iterable jsonResponse = json.decode(response.body);
-        List<Film> films = List<Film>.from(jsonResponse.map((model) => Film.fromJson(model)));
+        final jsonResponse = json.decode(response.body) as List;
+        final films = jsonResponse.map((model) => Film.fromJson(model)).toList();
         return films;
       } else {
         logger.e('Failed to load films: ${response.body}');
@@ -32,12 +49,16 @@ class FilmService {
 
   Future<Film?> getFilm(String id) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/$id'),
-        headers: {
-          'Authorization': 'Bearer ${AuthProvider.token}',
-        },
+      final response = await safeRequest(
+        () => http.get(
+          Uri.parse('$baseUrl/films/$id'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        ref
       );
+
       if (response.statusCode == 200) {
         return Film.fromJson(json.decode(response.body));
       } else {
@@ -51,14 +72,18 @@ class FilmService {
 
   Future<Film?> postFilm(Map<String, dynamic> filmData) async {
     try {
-      final response = await http.post(
-        Uri.parse(_baseUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${AuthProvider.token}',
-        },
-        body: json.encode(filmData),
+      final response = await safeRequest(
+        () => http.post(
+          Uri.parse("$baseUrl/films"),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: json.encode(filmData),
+        ),
+        ref
       );
+
       if (response.statusCode == 201) {
         return Film.fromJson(json.decode(response.body));
       } else {
@@ -72,14 +97,18 @@ class FilmService {
 
   Future<Film?> updateFilm(String id, Map<String, dynamic> filmData) async {
     try {
-      final response = await http.put(
-        Uri.parse('$_baseUrl/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${AuthProvider.token}',
-        },
-        body: json.encode(filmData),
+      final response = await safeRequest(
+        () => http.put(
+          Uri.parse('$baseUrl/films/$id'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: json.encode(filmData),
+        ),
+        ref
       );
+
       if (response.statusCode == 200) {
         return Film.fromJson(json.decode(response.body));
       } else {
@@ -93,12 +122,16 @@ class FilmService {
 
   Future<bool> deleteFilm(String id) async {
     try {
-      final response = await http.delete(
-        Uri.parse('$_baseUrl/$id'),
-        headers: {
-          'Authorization': 'Bearer ${AuthProvider.token}',
-        },
+      final response = await safeRequest(
+        () => http.delete(
+          Uri.parse('$baseUrl/films/$id'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+        ref
       );
+
       if (response.statusCode == 204) {
         return true;
       } else {

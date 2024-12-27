@@ -1,27 +1,35 @@
 import 'dart:convert';
-import 'package:film_randomizer/config/config.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 
 class AuthService {
   final Logger _logger = Logger();
+  final String baseUrl;
+
+  AuthService(this.baseUrl);
 
   Future<String?> login(Map<String, String> userData) async {
     try {
       final response = await http.post(
-        Uri.parse("$apiBaseUrl/login"),
+        Uri.parse("$baseUrl/login"),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
       );
-      final data = jsonDecode(response.body);
-      if (data['token'] != null) {
-        Logger().d(response.body);
-        return data['token'];
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['token'];
+        if (token != null) {
+          _logger.d(response.body);
+          return token;
+        } else {
+          _logger.e('Login failed: ${response.body}');
+        }
       } else {
-        _logger.e('Failed to login: ${response.body}');
+        _logger.e('Login request failed: ${response.body}');
       }
     } catch (e) {
-      _logger.e('Error login: $e');
+      _logger.e('Error during login: $e');
     }
     return null;
   }
@@ -29,19 +37,45 @@ class AuthService {
   Future<String?> register(Map<String, String> userData) async {
     try {
       final response = await http.post(
-        Uri.parse("$apiBaseUrl/register"),
+        Uri.parse("$baseUrl/register"),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(userData),
       );
+
       if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
-        return data['token'];
+        final token = data['token'];
+        if (token != null) {
+          return token;
+        } else {
+          _logger.e('Register failed: ${response.body}');
+        }
       } else {
-        _logger.e('Failed to register: ${response.body}');
+        _logger.e('Register request failed: ${response.body}');
       }
     } catch (e) {
-      _logger.e('Error register: $e');
+      _logger.e('Error during register: $e');
     }
     return null;
+  }
+
+  Future<bool> isLoggedIn(String token) async {
+    try {
+      final response = await http.post(
+        Uri.parse("$baseUrl/status"),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      _logger.d(jsonDecode(response.body));
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (e) {
+      _logger.e('Error checking login status: $e');
+    }
+    return false;
   }
 }

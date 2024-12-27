@@ -1,0 +1,3 @@
+###  Copy this file as .env and paste your values.  ###
+CLOUD_FILE_STORED_IP=URL_TO_CLOUD_STORED_IP_CONTAINIG_TXT_FILE
+SHOW_FILM_PICTURE=false

@@ -1,37 +1,35 @@
+import 'package:film_randomizer/config/config.dart';
+import 'package:film_randomizer/notifiers/film_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // NEW import for Riverpod
+
 import 'package:film_randomizer/generated/localization_accessors.dart';
-import 'package:film_randomizer/providers/film_provider.dart';
+import 'package:film_randomizer/models/film.dart';
 import 'package:film_randomizer/ui/screens/film_add_edit_page.dart';
 import 'package:film_randomizer/ui/widgets/delete_confirmation_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:film_randomizer/models/film.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
-
-class FilmDetailWidget extends StatefulWidget {
+class FilmDetailWidget extends ConsumerStatefulWidget {
   final Film film;
   final bool showAdditionalControls;
 
   const FilmDetailWidget({
     super.key,
     required this.film,
-    this.showAdditionalControls = false
+    this.showAdditionalControls = false,
   });
 
   @override
-  State<FilmDetailWidget> createState() => _FilmDetailWidgetState();
+  ConsumerState<FilmDetailWidget> createState() => _FilmDetailWidgetState();
 }
 
-
-class _FilmDetailWidgetState extends State<FilmDetailWidget> {
+class _FilmDetailWidgetState extends ConsumerState<FilmDetailWidget> {
   bool _isOverlayVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress: () {
-        _toggleOverlay();
-      },
+      onLongPress: _toggleOverlay,
       child: Card(
         margin: const EdgeInsets.all(8.0),
         clipBehavior: Clip.antiAlias,
@@ -41,16 +39,16 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
             _buildWatchedIndicator(),
             _buildCardLayout(context),
             if (_isOverlayVisible) _buildOverlay(context),
-          ]
-        )
-      )
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildCardLayout(BuildContext context) {
     return Row(
       children: [
-        if (widget.film.imageUrl.isNotEmpty) _buildImage(context),
+        if (widget.film.imageUrl.isNotEmpty && showFilmPicture) _buildImage(context),
         _buildCardContent(context),
       ],
     );
@@ -59,9 +57,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   Widget _buildImage(BuildContext context) {
     return Expanded(
       flex: 3,
-      child: Image.network(
-        widget.film.imageUrl,
-      ),
+      child: Image.network(widget.film.imageUrl),
     );
   }
 
@@ -71,10 +67,10 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          // mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // Title, genres, categories, addedBy
             Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,12 +84,14 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
                   children: [
                     Icon(
                       Icons.album,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.5),
                     ),
                     const SizedBox(width: 8.0),
                     Flexible(
                       child: Text(
-                        widget.film.genres.map((genre) => genre.localizedName(context)).join(', '),
+                        widget.film.genres
+                            .map((genre) => genre.localizedName(context))
+                            .join(', '),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -104,12 +102,14 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
                   children: [
                     Icon(
                       Icons.category,
-                      color: Theme.of(context).colorScheme.primary.withOpacity(0.5),
+                      color: Theme.of(context).colorScheme.primary.withValues( alpha: 0.5 ),
                     ),
                     const SizedBox(width: 8.0),
                     Flexible(
                       child: Text(
-                        widget.film.categories.map((category) => category.localizedName(context)).join(', '),
+                        widget.film.categories
+                            .map((category) => category.localizedName(context))
+                            .join(', '),
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -123,6 +123,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
                 ),
               ],
             ),
+            // Additional controls (if any)
             if (widget.showAdditionalControls) _buildAdditionalControls(context),
           ],
         ),
@@ -138,8 +139,8 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
         height: 50,
         width: 50,
         decoration: BoxDecoration(
-          color: widget.film.isWatched? Colors.green : Colors.redAccent,
-          borderRadius: const BorderRadius.all(Radius.circular(25))
+          color: widget.film.isWatched ? Colors.green : Colors.redAccent,
+          borderRadius: const BorderRadius.all(Radius.circular(25)),
         ),
       ),
     );
@@ -148,12 +149,11 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   Widget _buildOverlay(BuildContext context) {
     return Positioned.fill(
       child: GestureDetector(
-        onTap: () => _toggleOverlay(),
+        onTap: _toggleOverlay,
         child: Container(
           color: Colors.black54,
           child: Center(
             child: Wrap(
-              // mainAxisSize: MainAxisSize.min,
               spacing: 10,
               children: [
                 _buildDeleteButton(context),
@@ -169,16 +169,14 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   IconButton _buildEditButton(BuildContext context) {
     return IconButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith((states) {
-          return Theme.of(context).primaryColor;
-        }),
+        backgroundColor: WidgetStateProperty.all(Theme.of(context).primaryColor),
       ),
-      onPressed: () => {
+      onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => FilmEditPage(film: widget.film,)),
-        ),
-        _toggleOverlay()
+          MaterialPageRoute(builder: (context) => FilmEditPage(film: widget.film)),
+        );
+        _toggleOverlay();
       },
       icon: const Icon(Icons.edit_document),
       tooltip: L10nAccessor.get(context, "edit"),
@@ -188,9 +186,7 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   IconButton _buildDeleteButton(BuildContext context) {
     return IconButton(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.resolveWith((states) {
-          return Colors.red;
-        }),
+        backgroundColor: WidgetStateProperty.all(Colors.red),
       ),
       onPressed: () async {
         await _handleDelete(context);
@@ -201,20 +197,22 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   }
 
   Future<void> _handleDelete(BuildContext context) async {
-    final FilmProvider filmProvider = Provider.of<FilmProvider>(context, listen: false);
+    // Use our Riverpod filmProvider instead of the old Provider-based approach
+    final filmNotifier = ref.read(filmProvider.notifier);
 
     _toggleOverlay();
-    
-    final bool confirmDelete = await showDeleteConfirmationDialog(context);
-    
-    if (!confirmDelete || !context.mounted) return;
 
-    final result = await filmProvider.deleteFilm(widget.film);
-    
+    final bool confirmDelete = await showDeleteConfirmationDialog(context);
+    if (!confirmDelete || !mounted) return;
+
+    // Delete the film
+    final result = await filmNotifier.deleteFilm(widget.film);
     if (!context.mounted) return;
 
-    final message = L10nAccessor.get(context, result ? "film_delete_success" : "film_delete_error");
-
+    final message = L10nAccessor.get(
+      context,
+      result ? "film_delete_success" : "film_delete_error",
+    );
     Fluttertoast.showToast(msg: message);
   }
 
@@ -223,34 +221,32 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Wrap(
-          // mainAxisAlignment: MainAxisAlignment.center,
           alignment: WrapAlignment.spaceBetween,
           runAlignment: WrapAlignment.center,
           spacing: 8,
           runSpacing: 8,
           children: [
-            if(!widget.film.isWatched) _buildMarkAsWatchedButton(),
-            _buildOkButton(),
+            if (!widget.film.isWatched) _buildMarkAsWatchedButton(context),
+            _buildOkButton(context),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildMarkAsWatchedButton() {
+  Widget _buildMarkAsWatchedButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () async {
         setState(() {
           widget.film.isWatched = !widget.film.isWatched;
         });
-
         await _handleSave(context);
       },
       child: Text(L10nAccessor.get(context, "is_watched")),
     );
   }
 
-  Widget _buildOkButton() {
+  Widget _buildOkButton(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
         Navigator.of(context).pop();
@@ -260,22 +256,23 @@ class _FilmDetailWidgetState extends State<FilmDetailWidget> {
   }
 
   void _toggleOverlay() {
+    // If the user has showAdditionalControls, we don't toggle overlay
     if (widget.showAdditionalControls) return;
-    
+
     setState(() {
       _isOverlayVisible = !_isOverlayVisible;
     });
   }
 
   Future<void> _handleSave(BuildContext context) async {
-    final filmProvider = Provider.of<FilmProvider>(context, listen: false);
+    final filmNotifier = ref.read(filmProvider.notifier);
 
-    await filmProvider.updateFilm(widget.film);
+    // Update the film
+    await filmNotifier.updateFilm(widget.film);
 
     if (!context.mounted) return;
 
     final message = L10nAccessor.get(context, "film_marked_as_watched");
-
     Fluttertoast.showToast(msg: message);
 
     Navigator.of(context).pop();

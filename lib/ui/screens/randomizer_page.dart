@@ -3,35 +3,35 @@ import 'dart:math';
 import 'package:film_randomizer/models/base/localizable.dart';
 import 'package:film_randomizer/models/category.dart';
 import 'package:film_randomizer/models/genre.dart';
-import 'package:film_randomizer/providers/category_provider.dart';
-import 'package:film_randomizer/providers/genre_provider.dart';
+import 'package:film_randomizer/models/film.dart';
+import 'package:film_randomizer/notifiers/category_notifier.dart';
+import 'package:film_randomizer/notifiers/genre_notifier.dart';
 import 'package:film_randomizer/ui/widgets/film_detail_widget.dart';
 import 'package:film_randomizer/ui/widgets/multi_select_field.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:film_randomizer/models/film.dart';
 import 'package:film_randomizer/util/random_utilities.dart';
 import 'package:film_randomizer/generated/localization_accessors.dart';
-import 'package:provider/provider.dart';
+
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart'; // <-- NEW import
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class RandomizeScreen extends StatefulWidget {
+class RandomizeScreen extends ConsumerStatefulWidget {
   final Iterable<Film>? films;
-
   const RandomizeScreen({super.key, this.films});
-
   static String routeName = "/randomizer";
 
   @override
-  State<RandomizeScreen> createState() => _RandomizeScreenState();
+  ConsumerState<RandomizeScreen> createState() => _RandomizeScreenState();
 }
 
-class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProviderStateMixin {
+class _RandomizeScreenState extends ConsumerState<RandomizeScreen>
+    with SingleTickerProviderStateMixin {
   final ItemScrollController _itemScrollController = ItemScrollController();
   final ScrollOffsetController _scrollOffsetController = ScrollOffsetController();
   final ItemPositionsListener _itemPositionsListener = ItemPositionsListener.create();
   final ScrollOffsetListener _scrollOffsetListener = ScrollOffsetListener.create();
-  
+
   Iterable<Film> _films = [];
   Iterable<Film> _filteredFilms = [];
   Iterable<Genre> _genres = [];
@@ -41,39 +41,48 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
   List<Category> _categoriesToFilter = [];
 
   int? _selectedFilmIndex;
-
-  bool _includeWathced = false;
+  bool _includeWatched = false; // fixed typo _includeWathced -> _includeWatched
   bool _genresFilterIncludeMode = true;
   bool _categoriesFilterIncludeMode = true;
-
 
   @override
   void initState() {
     super.initState();
-    _loadInitialData();
-  }
 
-  void _loadInitialData() async {
-    final genreProvider = Provider.of<GenreProvider>(context, listen: false);
-    final categoryProvider = Provider.of<CategoryProvider>(context, listen: false);
+    // Load genres & categories (like we used to do with Provider.of(...))
+    // We'll do it after the first frame so we can safely use ref.read(...)
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Reload from your new Riverpod providers
+      await ref.read(genreProvider.notifier).reloadGenres();
+      await ref.read(categoryProvider.notifier).reloadCategories();
 
-    await genreProvider.loadGenres();
-    await categoryProvider.loadCategories();
-     
-    setState(() {
-      _genres = genreProvider.genres;
-      _categories = categoryProvider.categories;
-      _films = widget.films ?? [];
+      // Now read the current data from these providers
+      final loadedGenres = ref.read(genreProvider).maybeWhen(
+        data: (list) => list,
+        orElse: () => <Genre>[],
+      );
+      final loadedCategories = ref.read(categoryProvider).maybeWhen(
+        data: (list) => list,
+        orElse: () => <Category>[],
+      );
+
+      setState(() {
+        _genres = loadedGenres;
+        _categories = loadedCategories;
+        _films = widget.films ?? [];
+      });
+
+      _filterFilms(_films);
     });
-
-    _filterFilms(_films);
   }
 
   @override
   Widget build(BuildContext context) {
     if (widget.films == null || widget.films!.isEmpty) {
       Fluttertoast.showToast(msg: L10nAccessor.get(context, "missing_films"));
-      Navigator.of(context).pop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
     }
 
     return Scaffold(
@@ -93,6 +102,9 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
     );
   }
 
+  // ----------------------------------------------------------------
+  // Filter Controls
+  // ----------------------------------------------------------------
   Widget _buildFilterControls() {
     return Expanded(
       flex: 5,
@@ -102,19 +114,14 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
           child: Column(
             children: [
               CheckboxMenuButton(
-                value: _includeWathced,
+                value: _includeWatched,
                 onChanged: (include) {
-                  setState(
-                  () {
-                    _includeWathced = include!;
-                  });
+                  setState(() => _includeWatched = include ?? false);
                   _filterFilms(_films);
                 },
-                child: Text(
-                  L10nAccessor.get(context, "include_watched"),
-                ),
+                child: Text(L10nAccessor.get(context, "include_watched")),
               ),
-              ... _buildMultiSelectFields(),
+              ..._buildMultiSelectFields(),
             ],
           ),
         ),
@@ -129,11 +136,11 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
         _buildFilterRow(
           selectedItems: _genresToFilter,
           includeMode: _genresFilterIncludeMode,
-          toggleIncludeMode: () => setState(() => _genresFilterIncludeMode = !_genresFilterIncludeMode),
+          toggleIncludeMode: () => setState(() {
+            _genresFilterIncludeMode = !_genresFilterIncludeMode;
+          }),
           clearSelectedItems: () {
-            setState(() {
-              _genresToFilter = [];
-            });
+            setState(() => _genresToFilter = []);
             _filterFilms(_films);
           },
           multiselect: MultiSelectField<Genre>(
@@ -143,15 +150,13 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
             buttonText: L10nAccessor.get(context, "select_genres"),
             selectedItems: _genresToFilter,
             onConfirm: (items) {
-              setState(() {
-                _genresToFilter = items.toList();
-              });
+              setState(() => _genresToFilter = items.toList());
               _filterFilms(_films);
             },
             onChipTap: (item) {
               setState(() {
                 _genresToFilter.remove(item);
-                _genresToFilter = _genresToFilter.toList(); //Fixing chip not removing bug
+                _genresToFilter = _genresToFilter.toList();
               });
               _filterFilms(_films);
             },
@@ -163,11 +168,11 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
         _buildFilterRow(
           selectedItems: _categoriesToFilter,
           includeMode: _categoriesFilterIncludeMode,
-          toggleIncludeMode: () => setState(() => _categoriesFilterIncludeMode = !_categoriesFilterIncludeMode),
+          toggleIncludeMode: () => setState(() {
+            _categoriesFilterIncludeMode = !_categoriesFilterIncludeMode;
+          }),
           clearSelectedItems: () {
-            setState(() {
-              _categoriesToFilter = [];
-            });
+            setState(() => _categoriesToFilter = []);
             _filterFilms(_films);
           },
           multiselect: MultiSelectField<Category>(
@@ -177,15 +182,13 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
             buttonText: L10nAccessor.get(context, "select_categories"),
             selectedItems: _categoriesToFilter,
             onConfirm: (items) {
-              setState(() {
-                _categoriesToFilter = items.toList();
-              });
+              setState(() => _categoriesToFilter = items.toList());
               _filterFilms(_films);
             },
             onChipTap: (item) {
               setState(() {
                 _categoriesToFilter.remove(item);
-                _categoriesToFilter = _categoriesToFilter.toList(); //Fixing chip not removing bug
+                _categoriesToFilter = _categoriesToFilter.toList();
               });
               _filterFilms(_films);
             },
@@ -211,9 +214,7 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
           onPressed: toggleIncludeMode,
           tooltip: L10nAccessor.get(context, "switch_include_mode"),
         ),
-        Expanded(
-          child: multiselect,
-        ),
+        Expanded(child: multiselect),
         if (selectedItems.isNotEmpty)
           IconButton(
             icon: const Icon(Icons.delete),
@@ -224,6 +225,9 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
     );
   }
 
+  // ----------------------------------------------------------------
+  // Film Random List
+  // ----------------------------------------------------------------
   Widget _buildFilmRandomList() {
     return Stack(
       children: [
@@ -236,12 +240,10 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
           physics: const BouncingScrollPhysics(),
           itemBuilder: (context, index) {
             if (index < _filteredFilms.length) {
-              Film film = _filteredFilms.elementAt(index);
+              final film = _filteredFilms.elementAt(index);
               return _buildFilmListEntry(index, film);
             } else {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height,
-              );
+              return SizedBox(height: MediaQuery.of(context).size.height);
             }
           },
         ),
@@ -251,7 +253,7 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
   }
 
   Container _buildFilmListEntry(int index, Film film) {
-    bool isSelected = index == _selectedFilmIndex;
+    final isSelected = index == _selectedFilmIndex;
     return Container(
       padding: const EdgeInsets.all(8.0),
       decoration: isSelected
@@ -267,7 +269,7 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
             )
           : null,
       child: Text(
-        film.title!,
+        film.title ?? '',
         textAlign: TextAlign.center,
       ),
     );
@@ -302,28 +304,32 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
     );
   }
 
+  // ----------------------------------------------------------------
+  // Randomize Button
+  // ----------------------------------------------------------------
   Widget _buildRandomizeButton() {
     return FloatingActionButton(
+      onPressed: _handleRandomize,
       child: const Icon(Icons.shuffle),
-      onPressed: () {
-        _handleRandomize();
-      },
     );
   }
 
+  // Perform the randomization
   void _handleRandomize() {
+    // Reset scroll
     _itemScrollController.jumpTo(index: 0);
 
+    // Re-filter the main list
     _filterFilms(_films);
 
+    // Shuffle the list a bit
     setState(() {
       _filteredFilms = randomizeSize(_filteredFilms);
     });
 
+    // Pick a random film from the second half
     _selectedFilmIndex = Random().nextInt(_filteredFilms.length);
-    if (_selectedFilmIndex! < (_filteredFilms.length / 2).ceil() ) {
-      // Value should be always outside of 1/2 of the list, minimal repeats of films are 3 times
-      // This makes the rolling animation not too slow
+    if (_selectedFilmIndex! < (_filteredFilms.length / 2).ceil()) {
       _selectedFilmIndex = _selectedFilmIndex! + (_filteredFilms.length / 2).ceil();
     }
 
@@ -340,57 +346,57 @@ class _RandomizeScreenState extends State<RandomizeScreen> with SingleTickerProv
     }
   }
 
+  // Show details of the selected film
   void _showFilmDetails() {
     showGeneralDialog(
       context: context,
-
       pageBuilder: (context, animation, secondaryAnimation) {
         return Container();
       },
-      transitionBuilder: (context, animation, secondaryAnimation, child){
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
         return ScaleTransition(
           scale: Tween<double>(begin: 0.1, end: 1.0).animate(animation),
           child: SafeArea(
             child: FilmDetailWidget(
               film: _filteredFilms.elementAt(_selectedFilmIndex!),
-              showAdditionalControls: true
+              showAdditionalControls: true,
             ),
           ),
         );
       },
     );
   }
-  
+
+  // ----------------------------------------------------------------
+  // Local Filtering
+  // ----------------------------------------------------------------
   void _filterFilms(Iterable<Film> films) {
     if (films.isEmpty) return;
 
-    List<Film> temp = films.toList();
+    var temp = films.toList();
 
-    // filtering out films that are watched
-    if (!_includeWathced){
+    // Exclude watched if _includeWatched == false
+    if (!_includeWatched) {
       temp = temp.where((film) => film.isWatched == false).toList();
     }
 
-    // filtering by genres
+    // Filter by genres
     if (_genresToFilter.isNotEmpty) {
-      temp = temp.where(
-        (film) => _genresToFilter.any(
-          (genre) => _genresFilterIncludeMode ?
-            film.genres.contains(genre) // include
-            : !film.genres.contains(genre) // exclude
-        )
-      ).toList();
+      temp = temp.where((film) {
+        // if includeMode == true, we keep films that contain ANY of the selected genres
+        // if false, we keep films that do NOT contain ANY of the selected genres
+        final filmHasAnyGenre = _genresToFilter.any((g) => film.genres.contains(g));
+        return _genresFilterIncludeMode ? filmHasAnyGenre : !filmHasAnyGenre;
+      }).toList();
     }
 
-    // filtering by categories
+    // Filter by categories
     if (_categoriesToFilter.isNotEmpty) {
-      temp = temp.where(
-        (film) => _categoriesToFilter.any(
-          (category) => _categoriesFilterIncludeMode ?
-            film.categories.contains(category) // include
-            : !film.categories.contains(category) // exclude
-        )
-      ).toList();
+      temp = temp.where((film) {
+        final filmHasAnyCategory =
+            _categoriesToFilter.any((c) => film.categories.contains(c));
+        return _categoriesFilterIncludeMode ? filmHasAnyCategory : !filmHasAnyCategory;
+      }).toList();
     }
 
     setState(() {

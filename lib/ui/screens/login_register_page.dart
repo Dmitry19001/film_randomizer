@@ -1,19 +1,21 @@
+import 'package:film_randomizer/notifiers/auth_notifier.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:film_randomizer/generated/localization_accessors.dart';
-import 'package:film_randomizer/providers/auth_provider.dart';
 import 'package:film_randomizer/ui/screens/home_page.dart';
 import 'package:film_randomizer/ui/widgets/main_app_bar.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
-class LoginRegisterPage extends StatefulWidget {
+class LoginRegisterPage extends ConsumerStatefulWidget {
   const LoginRegisterPage({super.key});
   static String routeName = "/login";
+
   @override
-  State<LoginRegisterPage> createState() => _LoginRegisterPageState();
+  ConsumerState<LoginRegisterPage> createState() => _LoginRegisterPageState();
 }
 
-class _LoginRegisterPageState extends State<LoginRegisterPage> {
+class _LoginRegisterPageState extends ConsumerState<LoginRegisterPage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -22,17 +24,12 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   bool _isLoading = false;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final pageTitle = L10nAccessor.get(context, _loginMode? "login_page" : "register_page");
+    final pageTitle = L10nAccessor.get(context, _loginMode ? "login_page" : "register_page");
 
     return Scaffold(
       appBar: MainAppBar(title: pageTitle),
-      body:_buildLoginRegisterForm(),
+      body: _buildLoginRegisterForm(),
     );
   }
 
@@ -64,10 +61,10 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
               });
             },
             child: Text(
-              L10nAccessor.get(context, _loginMode? "goto_register" : "goto_login"),
+              L10nAccessor.get(context, _loginMode ? "goto_register" : "goto_login"),
               style: TextStyle(
                 color: Theme.of(context).hintColor,
-                decoration: TextDecoration.underline, 
+                decoration: TextDecoration.underline,
               ),
             ),
           ),
@@ -127,52 +124,55 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     );
   }
 
-
-
   ElevatedButton _buildSubmitButton() {
     return ElevatedButton(
       onPressed: () async {
         if (_formKey.currentState!.validate()) {
           _formKey.currentState!.save();
-          _handleSubmit(context);
+          _handleSubmit();
         }
       },
       child: _isLoading
           ? CircularProgressIndicator(color: Theme.of(context).colorScheme.onPrimary)
-          : Text(L10nAccessor.get(context, _loginMode? "login_action" : "register_action")),
+          : Text(L10nAccessor.get(context, _loginMode ? "login_action" : "register_action")),
     );
   }
 
-  Future<void> _handleSubmit(BuildContext context) async {
+  Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
       _isLoading = true;
     });
 
-    if (_loginMode){
-      _handleLogin(context);
+    if (_loginMode) {
+      await _handleLogin();
+    } else {
+      await _handleRegister();
     }
-    else {
-      _handleRegister(context);
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
-  Future<void> _handleLogin(BuildContext context) async {
-    AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
+  Future<void> _handleLogin() async {
+    // Instead of Provider.of<AuthProvider>(context, listen: false),
+    // we use Riverpod's ref.read(authProvider.notifier)
+    final result = await ref.read(authProvider.notifier).login(
+      _usernameController.text,
+      _passwordController.text,
+    );
 
-    final result = await authProvider.login(_usernameController.text, _passwordController.text);
-
-    setState(() {
-      _isLoading = false;
-    });
-    
-    if (!result && context.mounted) {
+    if (!result && mounted) {
       Fluttertoast.showToast(msg: L10nAccessor.get(context, "login_error"));
       return;
     }
-    
-    if (context.mounted) {
+
+    // If success, go to HomePage
+    if (mounted) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
@@ -180,17 +180,18 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
     }
   }
 
-  Future<void> _handleRegister(BuildContext context) async {
-    AuthProvider authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    final result = await authProvider.register(_usernameController.text, _passwordController.text);
-    _isLoading = false;
+  Future<void> _handleRegister() async {
+    final result = await ref.read(authProvider.notifier).register(
+      _usernameController.text,
+      _passwordController.text,
+    );
 
     if (!result && mounted) {
       Fluttertoast.showToast(msg: L10nAccessor.get(context, "ERROR"));
       return;
     }
-    
+
+    // If success, go to HomePage
     if (mounted) {
       Navigator.pushReplacement(
         context,

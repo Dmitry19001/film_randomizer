@@ -12,7 +12,7 @@ Future<bool> showDeleteConfirmationDialog(BuildContext context) async {
         TextButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.resolveWith((states) {
+            backgroundColor: WidgetStateProperty.resolveWith((states) {
               return Colors.red;
             }),
           ),
