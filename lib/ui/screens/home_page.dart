@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:film_randomizer/notifiers/settings_notifier.dart';
-import 'package:film_randomizer/states/settings_state.dart';
 
 import 'package:film_randomizer/models/film.dart';
 import 'package:film_randomizer/ui/screens/film_add_edit_page.dart';
@@ -26,36 +25,39 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
   }
 
-  bool _listening = false;
   bool _initialSyncDone = false;
+
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsProvider);
     final filmsAsync    = ref.watch(filmProvider);
 
-    // 1) Only register the listener once, during build
-    if (!_listening) {
-      _listening = true;
-      ref.listen<AsyncValue<SettingsState>>(settingsProvider, (prev, next) async {
-        final prevVal = prev?.value?.showWatched;
-        final nextVal = next.value?.showWatched;
-        if (nextVal != null && prevVal != nextVal) {
-          await _syncFilms(nextVal);
+    ref.listen<bool>(
+      // select out the inner boolean (default to false if loading)
+      settingsProvider.select(
+        (async) => async.value?.showWatched ?? false,
+      ),
+      (previous, next) {
+        if (previous != next) {
+          // debug/log to confirm it’s firing
+          debugPrint('showWatched changed: $previous → $next');
+          _syncFilms(next);
         }
-      });
-    }
+      },
+      // you can also do fireImmediately: true if you want an initial sync here
+    );
 
     // 2) Defer the *very first* sync once settings have arrived
-    if (!_initialSyncDone && settingsAsync.asData != null) {
+    if (!_initialSyncDone) {
       _initialSyncDone = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _syncFilms(settingsAsync.value!.showWatched);
+        _syncFilms(settingsAsync.value?.showWatched ?? false);
       });
     }
 
     return Scaffold(
       appBar: const MainAppBar(),
-      body: settingsAsync.when(
+      body: filmsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => Center(
           child: Text('Error loading settings: $err'),
@@ -127,11 +129,6 @@ class _HomePageState extends ConsumerState<HomePage> {
   // ----------------------------------------------------------------
   Future<void> _syncFilms([bool? showWatched]) async {
     // 1) Reload all films
-    await ref.read(filmProvider.notifier).reloadFilms();
-
-    // 2) If showWatched is false, filter out watched films
-    if (showWatched != null && !showWatched) {
-      await ref.read(filmProvider.notifier).filterWatched();
-    }
+    await ref.read(filmProvider.notifier).reloadFilms(showWatched:showWatched ?? false);
   }
 }

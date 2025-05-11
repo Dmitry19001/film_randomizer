@@ -19,14 +19,21 @@ class FilmService {
 
   final logger = Logger();
 
-  Future<List<Film>?> getFilms() async {
+  Future<List<Film>?> getFilms({bool showWatched = false}) async {
     try {
-      logger.d('Fetching films from $baseUrl/films');
       logger.d('Authorization: Bearer $token');
+
+      final uri = Uri.parse("$baseUrl/films").replace(
+        queryParameters: {
+          'showWatched': showWatched.toString(), // "true" or "false"
+        },
+      );
+
+      logger.d('Fetching films from $uri');
 
       final response = await safeRequest(
         () => http.get(
-          Uri.parse("$baseUrl/films"),
+          uri,
           headers: {'Authorization': 'Bearer $token'},
         ),
         ref,

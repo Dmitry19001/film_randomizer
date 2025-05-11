@@ -38,16 +38,16 @@ class FilmNotifier extends AsyncNotifier<List<Film>> {
   }
 
   /// Loads the list of films from the server (returns null on error).
-  Future<List<Film>?> _loadFilms() async {
+  Future<List<Film>?> _loadFilms({bool showWatched = false}) async {
     final service = _createFilmService();
-    return await service.getFilms();
+    return await service.getFilms(showWatched: showWatched);
   }
 
   /// Reloads the list of films from the server and updates [state].
-  Future<void> reloadFilms() async {
+  Future<void> reloadFilms({bool showWatched = false}) async {
     state = const AsyncValue.loading();
     try {
-      final films = await _loadFilms();
+      final films = await _loadFilms(showWatched: showWatched);
       if (films == null) {
         // If null, treat as error
         state = const AsyncValue.error('Failed to load films', StackTrace.empty);
@@ -98,17 +98,5 @@ class FilmNotifier extends AsyncNotifier<List<Film>> {
       return true;
     }
     return false;
-  }
-
-  /// Locally filter out watched films.
-  /// This does NOT call the server; it just modifies the local list in [state].
-  Future<void> filterWatched() async {
-    // If we're currently in a loading/error state, skip for now.
-    final current = state.valueOrNull;
-    if (current == null) return;
-
-    final filtered = current.where((film) => !film.isWatched).toList();
-    // Update the state with the filtered list
-    state = AsyncValue.data(filtered);
   }
 }
