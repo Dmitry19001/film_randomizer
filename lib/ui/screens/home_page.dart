@@ -26,39 +26,32 @@ class _HomePageState extends ConsumerState<HomePage> {
     super.initState();
   }
 
-  bool _didRegisterListener = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (!_didRegisterListener) {
-      _didRegisterListener = true;
-
-      // 1) Listen to settings changes
-      ref.listen<AsyncValue<SettingsState>>(
-        settingsProvider,
-        (previous, next) async {
-          final prevShowWatched = previous?.value?.showWatched;
-          final nextShowWatched = next.value?.showWatched;
-          if (nextShowWatched != null && prevShowWatched != nextShowWatched) {
-            await _syncFilms(nextShowWatched);
-          }
-        },
-      );
-
-      // 2) Defer the initial sync
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _syncFilms();
-      });
-    }
-  }
-
+  bool _listening = false;
+  bool _initialSyncDone = false;
   @override
   Widget build(BuildContext context) {
     final settingsAsync = ref.watch(settingsProvider);
+    final filmsAsync    = ref.watch(filmProvider);
 
-    // Watch the films from filmProvider
-    final filmsAsync = ref.watch(filmProvider);
+    // 1) Only register the listener once, during build
+    if (!_listening) {
+      _listening = true;
+      ref.listen<AsyncValue<SettingsState>>(settingsProvider, (prev, next) async {
+        final prevVal = prev?.value?.showWatched;
+        final nextVal = next.value?.showWatched;
+        if (nextVal != null && prevVal != nextVal) {
+          await _syncFilms(nextVal);
+        }
+      });
+    }
+
+    // 2) Defer the *very first* sync once settings have arrived
+    if (!_initialSyncDone && settingsAsync.asData != null) {
+      _initialSyncDone = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _syncFilms(settingsAsync.value!.showWatched);
+      });
+    }
 
     return Scaffold(
       appBar: const MainAppBar(),
