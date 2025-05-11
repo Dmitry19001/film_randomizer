@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:film_randomizer/generated/localization_accessors.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:film_randomizer/generated/l10n/app_localizations.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});

@@ -12,7 +12,7 @@ import 'package:film_randomizer/ui/screens/home_page.dart';
 import 'package:film_randomizer/ui/screens/login_register_page.dart';
 import 'package:film_randomizer/ui/themes/dark.dart';
 import 'package:film_randomizer/ui/themes/default.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:film_randomizer/generated/l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

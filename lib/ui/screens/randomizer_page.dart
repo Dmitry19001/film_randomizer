@@ -260,7 +260,7 @@ class _RandomizeScreenState extends ConsumerState<RandomizeScreen>
           ? BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  color: Theme.of(context).highlightColor.withOpacity(0.75),
+                  color: Theme.of(context).highlightColor.withValues(alpha: 0.75),
                   spreadRadius: 4,
                   blurRadius: 20,
                   offset: const Offset(0, 0),

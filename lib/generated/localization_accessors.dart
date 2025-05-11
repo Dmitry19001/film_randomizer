@@ -1,7 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:film_randomizer/generated/l10n/app_localizations.dart';
 
 class L10nAccessor {
   static String get(BuildContext context, String localizationId) {

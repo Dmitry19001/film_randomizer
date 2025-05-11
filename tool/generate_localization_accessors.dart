@@ -23,7 +23,7 @@ Future<void> main() async {
 
   buffer.writeln("// GENERATED CODE - DO NOT MODIFY BY HAND\n");
   buffer.writeln("import 'package:flutter/material.dart';");
-  buffer.writeln("import 'package:flutter_gen/gen_l10n/app_localizations.dart';\n");
+  buffer.writeln("import 'package:film_randomizer/generated/l10n/app_localizations.dart';\n");
   buffer.writeln("class L10nAccessor {");
 
   buffer.writeln("  static String get(BuildContext context, String localizationId) {");

@@ -40,7 +40,7 @@ class DefaultTheme {
         trackColor: WidgetStateProperty.resolveWith<Color>(
           (Set<WidgetState> states) {
             if (states.contains(WidgetState.selected)) {
-              return Colors.blue.withOpacity(0.5); // Light blue for active state
+              return Colors.blue.withValues(alpha: 0.5); // Light blue for active state
             }
             return Colors.white; // Default color for inactive state
           },
@@ -57,7 +57,7 @@ class DefaultTheme {
 
       extensions: [
         CustomThemeExtension(
-          chipColor: Colors.blue.withOpacity(0.5),
+          chipColor: Colors.blue.withValues(alpha: 0.5),
           textStyle: const TextStyle(color: Colors.white),
         ),
       ],

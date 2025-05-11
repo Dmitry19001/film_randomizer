@@ -1,3 +1,7 @@
-﻿{
-  arb-dir: "assets/l10n"
-}
+﻿# l10n.yaml (at the project root)
+arb-dir: assets/l10n
+output-dir: lib/generated/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+synthetic-package: false
