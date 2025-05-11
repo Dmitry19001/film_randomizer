@@ -5,7 +5,7 @@ class Genre extends Localizable{
 
   factory Genre.fromJson(Map<String, dynamic> json) {
     return Genre(
-      json['_id'],
+      json['id'].toString(),
       json['localizationId'],
     );
   }

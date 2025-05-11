@@ -27,24 +27,45 @@ class FilmService {
       final response = await safeRequest(
         () => http.get(
           Uri.parse("$baseUrl/films"),
-          headers: {
-            'Authorization': 'Bearer $token',
-          },
+          headers: {'Authorization': 'Bearer $token'},
         ),
-        ref
+        ref,
       );
 
-      if (response.statusCode == 200) {
-        final jsonResponse = json.decode(response.body) as List;
-        final films = jsonResponse.map((model) => Film.fromJson(model)).toList();
-        return films;
-      } else {
+      if (response.statusCode != 200) {
         logger.e('Failed to load films: ${response.body}');
+        return null;
       }
+
+      final decoded = json.decode(response.body);
+      if (decoded is! List) {
+        logger.e('Unexpected JSON format (not a List): $decoded');
+        return null;
+      }
+
+      final List<Film> films = [];
+      for (var i = 0; i < decoded.length; i++) {
+        final entry = decoded[i];
+        try {
+          if (entry is Map<String, dynamic>) {
+            films.add(Film.fromJson(entry));
+          } else {
+            throw FormatException('Expected Map<String, dynamic>, got ${entry.runtimeType}');
+          }
+        } catch (e) {
+          logger.e(
+            'Error parsing film at index $i:\n'
+            '  JSON: $entry\n'
+            '  Error: $e'
+          );
+        }
+      }
+
+      return films;
     } catch (e) {
       logger.e('Error fetching films: $e');
+      return null;
     }
-    return null;
   }
 
   Future<Film?> getFilm(String id) async {

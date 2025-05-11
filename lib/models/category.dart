@@ -5,7 +5,7 @@ class Category extends Localizable {
   
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
-      json['_id'],
+      json['id'].toString(),
       json['localizationId'],
     );
   }

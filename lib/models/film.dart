@@ -47,7 +47,7 @@ class Film {
         : [];
 
     return Film(
-      id: json['_id'],
+      id: json['id'].toString(),
       title: json['title'],
       isWatched: json['isWatched'] ?? false,
       genres: genres,
